@@ -1,0 +1,12 @@
+# Original Teenage Engineering firmware and anything built from it - never commit
+*.op1
+*.op1.unpacking
+op1-fw.zip
+*.ldr
+op1_246*/
+op1_*/
+content/
+
+# Python
+__pycache__/
+*.pyc
