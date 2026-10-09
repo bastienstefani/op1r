@@ -2,7 +2,7 @@
  "title": "OP-1 R246 custom firmware (synth SDK)",
  "description": [
   "custom synth engines with own screens (supersaw, fmbell, granular),",
-  "tape echo FX with own screen, OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).",
+  "tape echo + clouds granular FX with own screens, quad LFO (4 LFOs, voice/free),\n  OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).",
   "Built with synth_sdk/make_firmware.py; see docs/."
  ],
  "original": {
@@ -13,31 +13,37 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "e08686c3466df557684a657ee73b1a647ee92bce06fcb9309cbb2930a609a19a",
+   "result_sha256": "48053cb62d1892cb21f20825cbe3e10ca06e185bdab15474e70f31930afd2753",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "25"
+     "new": "9b"
     },
     {
      "op": "replace",
      "offset": 12,
-     "old": "d822",
-     "new": "dc7c"
+     "old": "d82221",
+     "new": "584522"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "0437e0"
+     "new": "1081e0"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "1037e0"
+     "new": "1c81e0"
+    },
+    {
+     "op": "replace",
+     "offset": 317408,
+     "old": "78c0a3",
+     "new": "4681e0"
     },
     {
      "op": "replace",
@@ -47,15 +53,51 @@
     },
     {
      "op": "replace",
+     "offset": 416328,
+     "old": "68ce9c",
+     "new": "5281e0"
+    },
+    {
+     "op": "replace",
+     "offset": 416360,
+     "old": "48d09c",
+     "new": "9e81e0"
+    },
+    {
+     "op": "replace",
+     "offset": 416392,
+     "old": "04d19c",
+     "new": "7881e0"
+    },
+    {
+     "op": "replace",
      "offset": 417456,
      "old": "34799e01000000000a789e",
      "new": "6004e001000000001004e0"
     },
     {
      "op": "replace",
+     "offset": 602162,
+     "old": "07e3c95a",
+     "new": "26e3c513"
+    },
+    {
+     "op": "replace",
      "offset": 620996,
      "old": "07e3f432",
      "new": "25e342ee"
+    },
+    {
+     "op": "replace",
+     "offset": 777828,
+     "old": "06e3c403",
+     "new": "24e3c0bc"
+    },
+    {
+     "op": "replace",
+     "offset": 880922,
+     "old": "05e3713a",
+     "new": "23e36df3"
     },
     {
      "op": "replace",
@@ -73,7 +115,7 @@
      "op": "replace",
      "offset": 1048526,
      "old": "18300b32",
-     "new": "22e2b3ab"
+     "new": "22e27dac"
     },
     {
      "op": "replace",
@@ -91,19 +133,49 @@
      "op": "replace",
      "offset": 1110328,
      "old": "03e38c71",
-     "new": "22e37c33"
+     "new": "22e34634"
+    },
+    {
+     "op": "replace",
+     "offset": 1146750,
+     "old": "ffe39b9f",
+     "new": "21e37fef"
+    },
+    {
+     "op": "replace",
+     "offset": 1147092,
+     "old": "ffe3bc9e",
+     "new": "21e382ef"
+    },
+    {
+     "op": "replace",
+     "offset": 1175074,
+     "old": "ffe3bdff",
+     "new": "21e389b4"
+    },
+    {
+     "op": "replace",
+     "offset": 1175162,
+     "old": "ffe391ff",
+     "new": "21e35db4"
     },
     {
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e21015"
+     "new": "21e2163a"
     },
     {
      "op": "replace",
      "offset": 1279908,
-     "old": "a5e609",
-     "new": "21e2f4"
+     "old": "a5e60900",
+     "new": "21e2fa25"
+    },
+    {
+     "op": "replace",
+     "offset": 1285244,
+     "old": "02e3d224",
+     "new": "20e3cedd"
     },
     {
      "op": "replace",
@@ -121,7 +193,7 @@
      "op": "replace",
      "offset": 1333822,
      "old": "02e33f59",
-     "new": "20e35980"
+     "new": "20e35381"
     },
     {
      "op": "replace",
@@ -131,9 +203,27 @@
     },
     {
      "op": "replace",
+     "offset": 1414414,
+     "old": "00e37dce",
+     "new": "1fe3cbe1"
+    },
+    {
+     "op": "replace",
      "offset": 1516098,
      "old": "00e3e75e",
      "new": "1fe3351a"
+    },
+    {
+     "op": "replace",
+     "offset": 1582584,
+     "old": "ffe31ae0",
+     "new": "1ee31699"
+    },
+    {
+     "op": "replace",
+     "offset": 1597100,
+     "old": "ffe3c0c3",
+     "new": "1ee3bc7c"
     },
     {
      "op": "replace",
@@ -145,21 +235,27 @@
      "op": "replace",
      "offset": 1642440,
      "old": "fbe3d0f2",
-     "new": "1ee3b424"
+     "new": "1ee37e25"
+    },
+    {
+     "op": "replace",
+     "offset": 1696356,
+     "old": "ffe3ea01",
+     "new": "1de3e6ba"
     },
     {
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "54074f132013ce152663be942b291b77d1c3df1938a4cb3def36c373fdac5d91",
-     "size": 23044
+     "sha256": "32aed9f5753d501379d96492aa079773240ba324e18ff81e96e5d3c167f6036d",
+     "size": 74368
     }
    ]
   },
   {
    "path": "content/op1_factory.db",
    "orig_sha256": "be4572298fe9dc83b106d5c4eaf1cc972280d97f028f3eaebc0c76dc68ac9cf0",
-   "result_sha256": "4284b981a5fdb159f6241af39c24fe641794f7c0c273e6ce884ae0dfc085f6a9",
+   "result_sha256": "683252684ac6d7eb135e0c9c63fc4016cc0946fdec5d3663e255dffd4133d006",
    "ops": [
     {
      "op": "replace",
@@ -176,14 +272,32 @@
     {
      "op": "replace",
      "offset": 1028,
-     "old": "0702880003c403860357031b02dd02b5028800000000",
-     "new": "09021a00024e03c403860357031b02dd02b50288021a"
+     "old": "0702880003c403860357031b02dd02b50288000000000000",
+     "new": "0a01db00024e03c403860357031b02dd02b50288021a01db"
     },
     {
      "op": "replace",
-     "offset": 1562,
-     "old": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-     "new": "320b04001561746170655b353336312c2031303530302c20383235302c2031323639312c2032313234392c20302c20302c20305d38020400196966696c7465725b373534382c20302c20383237322c2031393537322c20383030302c20383030302c20383030302c20383030305d"
+     "offset": 1499,
+     "old": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "new": "3d0c04001973636c6f7564735b373239362c2031323238382c2031363839362c2032303437392c2032313235302c2031363338342c2032323933382c20305d320b04001561746170655b353336312c2031303530302c20383235302c2031323639312c2032313234392c20302c20302c20305d38020400196966696c7465725b373534382c20302c20383237322c2031393537322c20383030302c20383030302c20383030302c20383030305d"
+    },
+    {
+     "op": "replace",
+     "offset": 2052,
+     "old": "0702dd",
+     "new": "08029b"
+    },
+    {
+     "op": "replace",
+     "offset": 2070,
+     "old": "0000",
+     "new": "029b"
+    },
+    {
+     "op": "replace",
+     "offset": 2715,
+     "old": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "new": "40080400157d717561645b31303030302c2031363030302c2032323030302c2032383030302c2031363531322c2031373533362c2031383536302c2031393538345d"
     },
     {
      "op": "replace",
@@ -214,6 +328,12 @@
  ],
  "added_files": [
   {
+   "path": "content/display/cloudsfx.svg",
+   "blob": "files/content_display_cloudsfx.svg",
+   "sha256": "79505bd520efc536ff7ae4948977aa384e2a1469911dd8b1cdb1b4720d666de5",
+   "template": "content/display/adsr.svg"
+  },
+  {
    "path": "content/display/fmbell.svg",
    "blob": "files/content_display_fmbell.svg",
    "sha256": "a4d2cddd8a286a47d9b5e4c62f976cce4c84097bdf0675398271daabf9b9e758",
@@ -232,6 +352,12 @@
    "template": "content/display/adsr.svg"
   },
   {
+   "path": "content/display/quadlfo.svg",
+   "blob": "files/content_display_quadlfo.svg",
+   "sha256": "c3c7fa3dfb4703c2c073dfde8a1522a90545ee092c9daf92f433f220c4e35381",
+   "template": "content/display/adsr.svg"
+  },
+  {
    "path": "content/display/supersaw.svg",
    "blob": "files/content_display_supersaw.svg",
    "sha256": "f2e02a1a325e3ef9751c5ac15b7da890aab775facd38c808ca34f345392da7ce",
@@ -245,8 +371,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "028e80a57caa18e1ffdb192a09076937007faf56ebb2fcb40fb2ee1ca4c4f088",
-  "sha256": "c7031a7b1ad801e2b32a1d9c805802000641f5691a93ce302323a7952234d2bf",
-  "size": 12772198
+  "tar_sha256": "a54747b21286a2b52612c17e26678dbd907c36298bb7b4f990178c610eb28f23",
+  "sha256": "138b6aa6a2e5ef055825b0160f5d42dd9a298a92d49609ce3b949a9e0a3f47cc",
+  "size": 12796317
  }
 }

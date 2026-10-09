@@ -5,6 +5,9 @@ with:
 
 - custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**
 - **tape** echo FX with its own screen (vintage tape echo)
+- **clouds** granular FX (port of Mutable Instruments Clouds) with its own screen
+- **quad** LFO: four LFOs with frequency / amount / target (synth knob, envelope, FX knob) / destination;
+  each per voice or free-running (white dot), encoder press selects LFO 1–4
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -36,7 +39,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `c7031a7b1ad801e2b32a1d9c805802000641f5691a93ce302323a7952234d2bf` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `138b6aa6a2e5ef055825b0160f5d42dd9a298a92d49609ce3b949a9e0a3f47cc` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
