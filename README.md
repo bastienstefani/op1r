@@ -13,6 +13,8 @@ with:
     flutter, age)
   - **clouds**: granular texture FX, a port of Mutable Instruments Clouds (position, size, pitch, density;
     encoder presses switch to a second page, red press freezes)
+  - **reverb**: lush plate/hall reverb, a port of the Mutable Instruments Elements reverb (time, mix, diffusion,
+    tone); generic FX screen
 - **quad** LFO: four LFOs in one slot, shown as four lanes over the full screen
   - blue frequency (0.05–20 Hz), green amount (bipolar), white target, red destination
   - works on synths and drums; targets: engine knob, envelope (synth ADSR, drum envelope) or FX knob
@@ -76,7 +78,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `6dfdb643b2c8337304e2ff226e0c50f6b77aa20a56c5f815b3ffee6d1a5ea40e` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `b07eadec568f457325381007fadf0b12c2d74f5873c7307bb04a20832a989c8a` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

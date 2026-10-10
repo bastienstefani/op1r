@@ -3,6 +3,18 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 16:27 — op1r 3
+
+Output `b07eadec568f457325381007fadf0b12c2d74f5873c7307bb04a20832a989c8a`
+
+### Added
+- **reverb** FX: port of the Mutable Instruments Elements reverb (MIT, © Emilie Gillet), on instruments and as
+  master FX. Blue time (decay, up to near-infinite), green mix, white diffusion, red tone (damping, dark to
+  bright). Generic FX screen.
+
+### Changed
+- Boot screen version: `op1r 3`.
+
 ## 2026-10-10 15:28 — op1r 2
 
 Output `6dfdb643b2c8337304e2ff226e0c50f6b77aa20a56c5f815b3ffee6d1a5ea40e`
