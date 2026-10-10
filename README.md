@@ -4,10 +4,16 @@ Turns the original Teenage Engineering OP-1 firmware **R246** (`op1_246.op1`) in
 with:
 
 - custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**
-- **tape** echo FX with its own screen (vintage tape echo)
-- **clouds** granular FX (port of Mutable Instruments Clouds) with its own screen
-- **quad** LFO: four LFOs with frequency / amount / target (synth knob, envelope, FX knob) / destination;
-  each per voice or free-running (white dot), encoder press selects LFO 1–4
+- custom FX with their own screens, usable on instruments **and as master FX** (mixer):
+  - **tape**: vintage tape echo (time with tape-speed pitch bends, feedback up to self-oscillation, wow &
+    flutter, age)
+  - **clouds**: granular texture FX, a port of Mutable Instruments Clouds (position, size, pitch, density;
+    encoder presses switch to a second page, red press freezes)
+- **quad** LFO: four LFOs in one slot, shown as four lanes over the full screen
+  - blue frequency (0.05–20 Hz), green amount (bipolar), white target, red destination
+  - targets: synth knob, envelope (A/D/S/R) or FX knob; each LFO runs **per voice** (locked to the notes, like the
+    stock LFOs) or **free-running** (white dot next to the target)
+  - press an encoder to select LFO 1–4
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -39,12 +45,14 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `138b6aa6a2e5ef055825b0160f5d42dd9a298a92d49609ce3b949a9e0a3f47cc` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `c19c52e44440ef5b6930fbfab4a1f718e1f3e76db7e591e89ddf19dc92254926` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
 
 Original firmware files (`*.op1`, `*.ldr`, unpacked trees) are git-ignored and must never be committed.
+
+See [CHANGELOG.md](CHANGELOG.md) for what changed between versions.
 
 ## Maintainers: rebuilding the patch data
 
