@@ -3,6 +3,19 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 21:18 — op1r 7
+
+Output `ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c`
+
+### Added
+- granular: the **input** key opens "keyboard to sample" on a granular slot like on the sampler; the recording goes
+  into the slot's sample buffer and is saved. The slot stays granular with its knobs (no switch to the sampler).
+- granular: **red press** toggles page 2 = sample gain (0–4×, default 1×), stored per slot; the red dial gets a ring
+  and shows the gain.
+
+### Changed
+- Boot screen version: `op1r 7`.
+
 ## 2026-10-10 20:43 — op1r 6
 
 Output `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1`

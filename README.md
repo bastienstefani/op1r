@@ -4,6 +4,8 @@ Turns the original Teenage Engineering OP-1 firmware **R246** (`op1_246.op1`) in
 with:
 
 - custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**; they follow note velocity
+  - **granular** plays the slot's sample: press **input** on a granular slot for "keyboard to sample" and record
+    straight into it (the slot stays granular); **red press** = page 2, sample gain (0–4×)
 - animated **lab screen for the stock iter synth**: gauges follow the knobs; bubbles, flame, falling dashes, voice
   dots and a note display react to the knobs and to what you play (graphic: `iter-lab.svg` from
   [op1repacker](https://github.com/op1hacks/op1repacker), MIT License, © 2016 op1hacks)
@@ -87,7 +89,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
