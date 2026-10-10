@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 20:43 — op1r 6
+
+Output `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1`
+
+### Added
+- Euclid: **level per slot** (note velocity 1–127, default 100) on page 2 of the red encoder, stored per pattern and
+  saved. Always shown as a red bar at the right border (dim above the level); a triangle marks red page 2.
+- Euclid: **lift / drop / scissors** on the euclid screen copy / paste / cut the selected slot; with **Shift** the whole
+  pattern. Running slots keep running.
+- Custom synth engines (supersaw, fmbell, granular) follow note velocity (euclid level, MIDI in).
+
+### Changed
+- Boot screen version: `op1r 6`.
+
 ## 2026-10-10 18:44 — op1r 5
 
 Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d`

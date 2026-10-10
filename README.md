@@ -3,7 +3,7 @@
 Turns the original Teenage Engineering OP-1 firmware **R246** (`op1_246.op1`) into a custom firmware
 with:
 
-- custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**
+- custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**; they follow note velocity
 - animated **lab screen for the stock iter synth**: gauges follow the knobs; bubbles, flame, falling dashes, voice
   dots and a note display react to the knobs and to what you play (graphic: `iter-lab.svg` from
   [op1repacker](https://github.com/op1hacks/op1repacker), MIT License, © 2016 op1hacks)
@@ -24,8 +24,10 @@ with:
 - **euclid** sequencer, an extra sequencer next to the stock ones (pick it in the sequencer list), for synth and drums
   - 6 sequencer slots, each playing one note; **Shift + white** selects the slot, a note key on the euclid screen
     assigns its note, at the octave of that moment
-  - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press blue/green/white for
-    page 2: rate (1/4 … 1/32, triplets), gate, octave
+  - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press an encoder for
+    page 2: rate (1/4 … 1/32, triplets), gate, octave, **level** (note velocity, per slot)
+  - the level is always shown as a red bar at the right border (triangle next to the dot while red is on page 2);
+    a playing slot shows a red dot in the centre of its ring
   - **Shift + G A B C D E** (the last six white keys) mutes/unmutes slots 1–6, **Shift + D#** mutes/unmutes all;
     a muted slot keeps running (dimmed dots) but plays nothing; works from any screen
   - **Shift + C#** starts all slots at once, or stops them if any is running; works from any screen. Hold **REC**
@@ -33,6 +35,8 @@ with:
   - **4 patterns** per synth/drum: **Shift + F G A B** (the first four white keys) switches to pattern 1–4
     immediately, from any screen (also the tape view). A pattern holds the notes and settings of all slots incl. mutes;
     which slots are playing stays the same across patterns. The pattern number (P1–P4) is shown bottom left
+  - on the euclid screen **lift / drop / scissors** copy / paste / cut the selected slot; with **Shift** the whole
+    pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
@@ -83,7 +87,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
