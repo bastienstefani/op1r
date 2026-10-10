@@ -24,6 +24,23 @@ with:
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
+## Screens
+
+Rendered on the PC from the same screen code that runs on the OP-1 (host harness in the synth SDK).
+
+| Synth engines | |
+|---|---|
+| ![supersaw](docs/images/synth_supersaw.png) **supersaw** | ![fmbell](docs/images/synth_fmbell.png) **fmbell** |
+| ![granular](docs/images/synth_granular.png) **granular** | |
+
+| Effects | |
+|---|---|
+| ![tape](docs/images/fx_tape.png) **tape** echo | ![clouds](docs/images/fx_clouds.png) **clouds** |
+
+| LFO | Sequencer |
+|---|---|
+| ![quad LFO](docs/images/lfo_quad.png) **quad** LFO | ![euclid](docs/images/seq_euclid.png) **euclid** sequencer |
+
 The repository contains no Teenage Engineering firmware. You provide the original update file, and the
 patcher applies only the differences stored in `data/`. These are our code, our screen SVGs and small
 byte edits.
