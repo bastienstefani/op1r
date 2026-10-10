@@ -3,6 +3,18 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 17:34 — op1r 4
+
+Output `6747a7d67133990d690ac40dd5544c2484812d71fde0f0b7c2a72b4f78fc5213`
+
+### Added
+- Euclid: **Shift + C#** starts all slots at once, or stops all if any is running (any screen).
+- Euclid: holding **REC** (tape armed) while Shift + C# starts the slots also starts the tape, like REC + PLAY, so
+  the recording begins with the first step.
+
+### Changed
+- Boot screen version: `op1r 4`.
+
 ## 2026-10-10 16:27 — op1r 3
 
 Output `b07eadec568f457325381007fadf0b12c2d74f5873c7307bb04a20832a989c8a`

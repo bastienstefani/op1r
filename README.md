@@ -28,6 +28,8 @@ with:
     page 2: rate (1/4 … 1/32, triplets), gate, octave
   - **Shift + G A B C D E** (the last six white keys) mutes/unmutes slots 1–6, **Shift + D#** mutes/unmutes all;
     a muted slot keeps running (dimmed dots) but plays nothing; works from any screen
+  - **Shift + C#** starts all slots at once, or stops them if any is running; works from any screen. Hold **REC**
+    (tape armed) while starting and the tape starts recording with the first step
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
@@ -78,7 +80,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `b07eadec568f457325381007fadf0b12c2d74f5873c7307bb04a20832a989c8a` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `6747a7d67133990d690ac40dd5544c2484812d71fde0f0b7c2a72b4f78fc5213` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
