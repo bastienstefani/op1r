@@ -117,7 +117,7 @@ def main():
     man = {'title': a.title,
            'description': ['custom synth engines with own screens (supersaw, fmbell, granular),',
                            'tape echo + clouds granular FX with own screens, quad LFO (4 LFOs, voice/free),\n'
-                           '  OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).',
+                           '  euclid sequencer (6 slots), OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).',
                            'Built with synth_sdk/make_firmware.py; see docs/.'],
            'original': {'name': os.path.basename(a.original), 'sha256': P.sha256(op1)},
            'patched_files': patched, 'added_files': added,

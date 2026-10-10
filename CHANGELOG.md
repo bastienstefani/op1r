@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 10:30
+
+Output `a8bc18bc27fa35ae08c42f0eccf33a8d582c7c5fea218f0d02d5aeb158aeaccf`
+
+### Added
+- **euclid** sequencer: an extra entry in the sequencer list (finger and the other stock sequencers are unchanged),
+  for synth and drums.
+  - 6 slots per mode, each a euclidean rhythm on one note. Shift + white selects the slot; a note key pressed on the
+    euclid screen assigns its note at the current octave (later octave changes keep the slot's pitch, also on drums).
+  - Encoders: steps, pulses, rotation (clockwise), red start/stop; Shift + red starts/stops all slots with a note.
+    Encoder presses switch blue/green/white to rate, gate and octave.
+  - Locked to the OP-1 tempo clock, polyphonic, sends MIDI notes. The left/right buttons change the keyboard octave
+    as usual. Settings are live only (not saved yet).
+
 ## 2026-10-10 08:10 — v1.0
 
 Output `b720d371722f1c48850358dc5eebba13602155e142f5f2ea30480389d4caf557`

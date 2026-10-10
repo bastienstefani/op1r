@@ -15,6 +15,12 @@ with:
   - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
     to the target)
   - press an encoder to select LFO 1–4
+- **euclid** sequencer, an extra sequencer next to the stock ones (pick it in the sequencer list), for synth and drums
+  - 6 sequencer slots, each playing one note; **Shift + white** selects the slot, a note key on the euclid screen
+    assigns its note, at the octave of that moment
+  - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press blue/green/white for
+    page 2: rate (1/4 … 1/32, triplets), gate, octave
+  - runs at the OP-1 tempo, plays polyphonically and sends MIDI; settings are not saved yet
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -46,7 +52,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `b720d371722f1c48850358dc5eebba13602155e142f5f2ea30480389d4caf557` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `a8bc18bc27fa35ae08c42f0eccf33a8d582c7c5fea218f0d02d5aeb158aeaccf` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
