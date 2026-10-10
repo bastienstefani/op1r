@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 14:15 — op1r 1
+
+Output `4e037a342db27244ad4db863ded47e023e893e210d1ed42634824a08cda5ac69`
+
+### Added
+- Version number on the boot screen: `op1r 1` under the TE logo (replaces `R. 00246`).
+- Animated **lab screen for the stock iter synth** (graphic `iter-lab.svg` from op1repacker, MIT License,
+  © 2016 op1hacks). The gauges follow the knobs. Bubble speed follows the blue knob and the falling dashes the red
+  knob. Bubbles, the flame (brighter with the volume), voice dots and the last played note react to playing.
+  The pipes are brighter than in the original graphic.
+- Quad LFO on drums: the envelope target now modulates the drum envelope.
+
+### Fixed
+- Quad LFO on drums: engine knob targets had no effect. They were applied in the drum envelope pass instead of the
+  per-voice pass.
+
 ## 2026-10-10 10:30
 
 Output `a8bc18bc27fa35ae08c42f0eccf33a8d582c7c5fea218f0d02d5aeb158aeaccf`

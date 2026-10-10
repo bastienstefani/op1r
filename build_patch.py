@@ -115,7 +115,7 @@ def main():
     patched.sort(key=lambda f: f['path']); added.sort(key=lambda f: f['path'])
 
     man = {'title': a.title,
-           'description': ['custom synth engines with own screens (supersaw, fmbell, granular),',
+           'description': ['op1r 1: custom synth engines with own screens (supersaw, fmbell, granular), iter lab screen,',
                            'tape echo + clouds granular FX with own screens, quad LFO (4 LFOs, voice/free),\n'
                            '  euclid sequencer (6 slots), OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).',
                            'Built with synth_sdk/make_firmware.py; see docs/.'],

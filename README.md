@@ -4,6 +4,10 @@ Turns the original Teenage Engineering OP-1 firmware **R246** (`op1_246.op1`) in
 with:
 
 - custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**
+- animated **lab screen for the stock iter synth**: gauges follow the knobs; bubbles, flame, falling dashes, voice
+  dots and a note display react to the knobs and to what you play (graphic: `iter-lab.svg` from
+  [op1repacker](https://github.com/op1hacks/op1repacker), MIT License, © 2016 op1hacks)
+- boot screen shows `op1r <version>` under the TE logo
 - custom FX with their own screens, usable on instruments **and as master FX** (mixer):
   - **tape**: vintage tape echo (time with tape-speed pitch bends, feedback up to self-oscillation, wow &
     flutter, age)
@@ -11,7 +15,7 @@ with:
     encoder presses switch to a second page, red press freezes)
 - **quad** LFO: four LFOs in one slot, shown as four lanes over the full screen
   - blue frequency (0.05–20 Hz), green amount (bipolar), white target, red destination
-  - works on synths and drums; targets: engine knob, envelope (A/D/S/R, synth only) or FX knob
+  - works on synths and drums; targets: engine knob, envelope (synth ADSR, drum envelope) or FX knob
   - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
     to the target)
   - press an encoder to select LFO 1–4
@@ -31,7 +35,7 @@ Rendered on the PC from the same screen code that runs on the OP-1 (host harness
 | Synth engines | |
 |---|---|
 | ![supersaw](docs/images/synth_supersaw.png) **supersaw** | ![fmbell](docs/images/synth_fmbell.png) **fmbell** |
-| ![granular](docs/images/synth_granular.png) **granular** | |
+| ![granular](docs/images/synth_granular.png) **granular** | ![iter lab](docs/images/synth_iterlab.png) **iter** (lab screen) |
 
 | Effects | |
 |---|---|
@@ -69,7 +73,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `a8bc18bc27fa35ae08c42f0eccf33a8d582c7c5fea218f0d02d5aeb158aeaccf` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `4e037a342db27244ad4db863ded47e023e893e210d1ed42634824a08cda5ac69` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
