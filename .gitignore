@@ -10,3 +10,6 @@ content/
 # Python
 __pycache__/
 *.pyc
+
+# analysis work directory (tools/analyze.sh): firmware files, disassembly
+work/
