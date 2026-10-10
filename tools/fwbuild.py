@@ -3,7 +3,7 @@
 
     fwbuild.py op1_246.op1 -o out.op1 [--op1r] [--blob code.bin@0x01f00000 ...]
                [--call SITE=TARGET ...] [--jump SITE=TARGET ...] [--word ADDR=VALUE ...] [--bytes ADDR=HEX ...]
-               [--file PATH=LOCALFILE ...] [--ldr-out OP1_vdk.ldr]
+               [--text ADDR=TEXT ...] [--file PATH=LOCALFILE ...] [--sql DB=STATEMENT ...] [--ldr-out OP1_vdk.ldr]
 
   --op1r          start from the op1r patch (data/manifest.json) instead of the stock firmware
   --blob F@ADDR   load the raw binary F at ADDR (new LDR block inserted before the FINAL block)
@@ -12,7 +12,10 @@
                   prologue; use --force to skip the check)
   --word A=V      32-bit little-endian data word at A (e.g. a vtable slot or a pointer)
   --bytes A=HEX   raw bytes at A
+  --text A=TEXT   replace the C string at A in place (the new text must fit; the rest is filled with NUL)
   --file P=F      add or replace a file of the image (e.g. content/display/my.svg, content/op1_factory.db)
+  --sql DB=SQL    run an SQL statement on a database of the image, e.g.
+                  --sql "content/op1_factory.db=INSERT INTO fx_types VALUES (2, 'filter', '[...]')"
 
 Addresses are load addresses (as in the disassembly), not file offsets. Sites must lie in an LDR payload block
 (not in BSS/fill). Each edit checks it does not touch a region already modified in this run.
@@ -20,7 +23,7 @@ Addresses are load addresses (as in the disassembly), not file offsets. Sites mu
 Nothing here is verified on hardware unless you flash-test it. The bootloader is never touched, so the original
 op1_246.op1 can always be reflashed. Use at your own risk.
 """
-import argparse, copy, os, struct, sys
+import argparse, copy, os, sqlite3, struct, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -72,7 +75,9 @@ def main():
     ap.add_argument('--jump', action='append', default=[])
     ap.add_argument('--word', action='append', default=[])
     ap.add_argument('--bytes', action='append', default=[])
+    ap.add_argument('--text', action='append', default=[])
     ap.add_argument('--file', action='append', default=[])
+    ap.add_argument('--sql', action='append', default=[])
     ap.add_argument('--force', action='store_true', help='skip the "site holds a CALL" checks')
     ap.add_argument('--ldr-out', help='also write the resulting OP1_vdk.ldr here')
     a = ap.parse_args()
@@ -139,6 +144,20 @@ def main():
         old = put(int(ad, 0), bytes.fromhex(hx), 'bytes')
         print(f'bytes  {int(ad, 0):#010x} = {hx}   (was {old.hex()})')
 
+    for spec in a.text:
+        ad, _, txt = spec.partition('=')
+        ad = int(ad, 0)
+        bl = list(T.ldr_blocks(ldr))
+        off = T.addr2off(bl, ad)
+        if off is None:
+            raise SystemExit(f'text {ad:#x}: not in the image payload')
+        n = ldr.index(0, off) - off                         # length of the existing string
+        new = txt.encode()
+        if len(new) > n:
+            raise SystemExit(f'text {ad:#x}: {txt!r} is longer than the original ({n} bytes)')
+        old = put(ad, new + bytes(n - len(new)), 'text')
+        print(f'text   {ad:#010x} = {txt!r}   (was {old.decode("latin1")!r})')
+
     for _ in T.ldr_blocks(ldr):                             # re-parse: raises on a broken block chain
         pass
     members[li] = (members[li][0], bytes(ldr))
@@ -155,6 +174,18 @@ def main():
             info.name = path
             members.append((info, data))
         print(f'file   {path} <- {local}')
+    for spec in a.sql:
+        path, _, stmt = spec.partition('=')
+        i = by_name[path]
+        with tempfile.TemporaryDirectory() as td:
+            fn = os.path.join(td, 'x.db')
+            open(fn, 'wb').write(members[i][1])
+            con = sqlite3.connect(fn)
+            con.execute(stmt)
+            con.commit()
+            con.close()
+            members[i] = (members[i][0], open(fn, 'rb').read())
+        print(f'sql    {path}: {stmt}')
     if a.ldr_out:
         open(a.ldr_out, 'wb').write(ldr)
     out = P.pack_op1(P.pack_tar(members))

@@ -3,6 +3,16 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 — study tools (patch output unchanged)
+
+Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (same as op1r 5)
+
+### Added
+- `docs/firmware-r246.md`: study of the original R246 firmware and of every op1r edit (in French).
+- `tools/`: `analyze.sh`, `fwtool.py` (LDR/memory/xref helpers), `fwbuild.py` (experimental image builder),
+  `build_bfin_toolchain.sh` (binutils + GCC for bfin-elf).
+- `examples/midi-panic`: C hook example (Shift + key → MIDI All Notes Off), not flash-tested.
+
 ## 2026-10-10 18:44 — op1r 5
 
 Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d`

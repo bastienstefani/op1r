@@ -11,6 +11,7 @@
     fwtool.py rd      WORK/mem/regions.json 0x19103e0 [N]       dump N 32-bit words
     fwtool.py dump    WORK/mem/regions.json 0x18ab7cc 0x1aa7078 code.bin   raw bytes of an address range
     fwtool.py ptr     WORK/mem/regions.json 0x19b99d4 [END]     find 32-bit words == value (or in [value, END))
+    fwtool.py branch  WORK/orig/OP1_vdk.ldr 0x19c2d3e   target of the CALL/JUMP.L at an address
     fwtool.py xref    code.dis strings.txt funcs.json            heuristic function map from a bfin objdump listing
     fwtool.py hooks   WORK/orig [--funcs funcs.json]            decode every code edit of the patch (CALL/JUMP.L)
 
@@ -190,6 +191,18 @@ def cmd_offset(a):
     print(f'{r:#x}' if r is not None else 'address not backed by LDR payload (BSS/fill or unmapped)')
 
 
+def cmd_branch(a):
+    d = open(a.ldr, 'rb').read()
+    ad = int(a.addr, 0)
+    off = addr2off(list(ldr_blocks(d)), ad)
+    if off is None:
+        raise SystemExit(f'{ad:#x} is not in the image payload')
+    kind, t = decode_branch(ad, d[off:off + 4])
+    if not kind:
+        raise SystemExit(f'{ad:#x}: no CALL/JUMP.L here ({d[off:off + 4].hex()})')
+    print(f'{t:#010x}' if a.quiet else f'{ad:#010x}: {kind} {t:#010x}')
+
+
 def cmd_rd(a):
     m = Mem(a.regions)
     base = int(a.addr, 0)
@@ -318,6 +331,7 @@ def main():
     c = sp.add_parser('strings'); c.add_argument('regions'); c.add_argument('--min', type=int, default=5)
     c = sp.add_parser('addr'); c.add_argument('ldr'); c.add_argument('value')
     c = sp.add_parser('offset'); c.add_argument('ldr'); c.add_argument('value')
+    c = sp.add_parser('branch'); c.add_argument('ldr'); c.add_argument('addr'); c.add_argument('-q', '--quiet', action='store_true')
     c = sp.add_parser('rd'); c.add_argument('regions'); c.add_argument('addr'); c.add_argument('n', type=int, nargs='?', default=16)
     c = sp.add_parser('dump'); c.add_argument('regions'); c.add_argument('start'); c.add_argument('end'); c.add_argument('out')
     c = sp.add_parser('ptr'); c.add_argument('regions'); c.add_argument('value'); c.add_argument('end', nargs='?')

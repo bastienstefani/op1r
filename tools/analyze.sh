@@ -1,7 +1,7 @@
 #!/bin/sh
 # Unpack the original R246 image and build everything needed to study it (see docs/firmware-r246.md):
 #   tools/analyze.sh /path/to/op1_246.op1 [WORKDIR]          (default WORKDIR: work/, git-ignored)
-# Needs a Blackfin objdump (tools/build_bfin_objdump.sh); set BFIN_OBJDUMP if it is not bfin-elf-objdump in PATH.
+# Needs a Blackfin objdump (tools/build_bfin_toolchain.sh --binutils-only); set BFIN_OBJDUMP if it is not bfin-elf-objdump in PATH.
 set -e
 FW=${1:?usage: tools/analyze.sh op1_246.op1 [workdir]}
 W=${2:-work}
@@ -26,7 +26,7 @@ if command -v "$OD" >/dev/null 2>&1; then
     $PY xref "$W/sdram.dis" "$W/strings.txt" "$W/funcs.json"
     $PY hooks "$W/orig" --funcs "$W/funcs.json" > "$W/hooks.txt"
 else
-    echo "no Blackfin objdump ($OD): skipping disassembly (tools/build_bfin_objdump.sh builds one)"
+    echo "no Blackfin objdump ($OD): skipping disassembly (tools/build_bfin_toolchain.sh --binutils-only builds one)"
     $PY hooks "$W/orig" > "$W/hooks.txt"
 fi
 echo "done: $W"
