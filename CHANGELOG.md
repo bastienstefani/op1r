@@ -3,6 +3,23 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 18:44 — op1r 5
+
+Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d`
+
+### Added
+- Euclid patterns: 4 per synth/drum, recalled with **Shift + F G A B** (any screen, also the tape view). Each
+  pattern stores note, steps, pulses, rotation, rate, gate, octave and mute of all 6 slots and is saved. Switching
+  is immediate; playing slots stay in time. P1–P4 is shown at the bottom left of the euclid screen.
+
+### Changed
+- Euclid: which slots are playing is global across patterns. Shift + red / Shift + C# start all six slots; a slot
+  without a note in the current pattern runs silently and plays when a pattern with a note there is recalled.
+- Euclid screen: the red play/stop row is gone; a playing slot shows a red dot in the centre of the big ring
+  (and of its small ring, also when it has no note).
+- Euclid settings saved by earlier versions load into pattern 1.
+- Boot screen version: `op1r 5`.
+
 ## 2026-10-10 17:34 — op1r 4
 
 Output `6747a7d67133990d690ac40dd5544c2484812d71fde0f0b7c2a72b4f78fc5213`

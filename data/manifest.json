@@ -13,43 +13,43 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "497fd394a410276c902852a9fbf8e301728cb7b80400de55b331515d5ec827a0",
+   "result_sha256": "34342a5f616db654eba7b4bea8ae283cb0ed19652ff5c288a8966cbd2e3f7f62",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "82"
+     "new": "57"
     },
     {
      "op": "replace",
      "offset": 12,
      "old": "d82221",
-     "new": "9c9822"
+     "new": "70a122"
     },
     {
      "op": "replace",
      "offset": 313970,
      "old": "522e203030323436",
-     "new": "20206f7031722034"
+     "new": "20206f7031722035"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "40bce0"
+     "new": "e0bee0"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "4cbce0"
+     "new": "ecbee0"
     },
     {
      "op": "replace",
      "offset": 317408,
      "old": "78c0a3",
-     "new": "76bce0"
+     "new": "16bfe0"
     },
     {
      "op": "replace",
@@ -61,19 +61,19 @@
      "op": "replace",
      "offset": 416328,
      "old": "68ce9c",
-     "new": "82bce0"
+     "new": "22bfe0"
     },
     {
      "op": "replace",
      "offset": 416360,
      "old": "48d09c",
-     "new": "cebce0"
+     "new": "6ebfe0"
     },
     {
      "op": "replace",
      "offset": 416392,
      "old": "04d19c",
-     "new": "a8bce0"
+     "new": "48bfe0"
     },
     {
      "op": "replace",
@@ -175,13 +175,13 @@
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e2ae57"
+     "new": "21e2fe58"
     },
     {
      "op": "replace",
      "offset": 1279908,
      "old": "a5e60900",
-     "new": "21e29243"
+     "new": "21e2e244"
     },
     {
      "op": "replace",
@@ -223,7 +223,7 @@
      "op": "replace",
      "offset": 1450940,
      "old": "ffe38801",
-     "new": "1fe34cb9"
+     "new": "1fe39cba"
     },
     {
      "op": "replace",
@@ -289,8 +289,8 @@
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "a32b79b5128400bd61b269273a30bf8c6753b70e072ca33d3ea608f7fd1fb015",
-     "size": 95684
+     "sha256": "95c8ea6199a07c1b45eef4793caf417482e1c14c5386288437f83f673a0625e7",
+     "size": 97944
     }
    ]
   },
@@ -443,8 +443,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "f67a77ed1463c74c6b968a94b6964cc4e1c89acb858521bd582665ea98cb17e3",
-  "sha256": "6747a7d67133990d690ac40dd5544c2484812d71fde0f0b7c2a72b4f78fc5213",
-  "size": 12811230
+  "tar_sha256": "18006e9de547b72cb11a4969428e34683f01019aa79d9664eae89653c7b7105c",
+  "sha256": "d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d",
+  "size": 12811275
  }
 }
