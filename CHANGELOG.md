@@ -3,6 +3,18 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 08:10 — v1.0
+
+Output `b720d371722f1c48850358dc5eebba13602155e142f5f2ea30480389d4caf557`
+
+### Added
+- Quad LFO modulates **drums**: on the drum page, the synth target moves the drum engine knobs and the fx target
+  moves the drum FX knobs, just like on the synth. Synth and drum LFOs run independently.
+
+### Changed
+- Drum page: the white encoder skips the envelope targets (drums have no envelope to modulate). Voice-mode LFOs
+  on drums advance every block, so they behave like free-running ones.
+
 ## 2026-10-10 07:45
 
 Output `c19c52e44440ef5b6930fbfab4a1f718e1f3e76db7e591e89ddf19dc92254926`

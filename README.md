@@ -11,8 +11,9 @@ with:
     encoder presses switch to a second page, red press freezes)
 - **quad** LFO: four LFOs in one slot, shown as four lanes over the full screen
   - blue frequency (0.05–20 Hz), green amount (bipolar), white target, red destination
-  - targets: synth knob, envelope (A/D/S/R) or FX knob; each LFO runs **per voice** (locked to the notes, like the
-    stock LFOs) or **free-running** (white dot next to the target)
+  - works on synths and drums; targets: engine knob, envelope (A/D/S/R, synth only) or FX knob
+  - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
+    to the target)
   - press an encoder to select LFO 1–4
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
@@ -45,7 +46,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `c19c52e44440ef5b6930fbfab4a1f718e1f3e76db7e591e89ddf19dc92254926` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `b720d371722f1c48850358dc5eebba13602155e142f5f2ea30480389d4caf557` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
