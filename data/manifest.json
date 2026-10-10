@@ -1,7 +1,7 @@
 {
  "title": "OP-1 R246 custom firmware (synth SDK)",
  "description": [
-  "op1r 1: custom synth engines with own screens (supersaw, fmbell, granular), iter lab screen,",
+  "op1r 2: custom synth engines with own screens (supersaw, fmbell, granular), iter lab screen,",
   "tape echo + clouds granular FX with own screens, quad LFO (4 LFOs, voice/free),\n  euclid sequencer (6 slots), OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).",
   "Built with synth_sdk/make_firmware.py; see docs/."
  ],
@@ -13,43 +13,43 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "cbc3d491329511972ecbdeac715b0d4a7cc1b4e4494f25498822877bea35f6d1",
+   "result_sha256": "91b4cb400cdb80e4e353740c27b46744b4608561a30ea072a8961ae806180ec9",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "cf"
+     "new": "ae"
     },
     {
      "op": "replace",
      "offset": 12,
      "old": "d82221",
-     "new": "c88122"
+     "new": "a48c22"
     },
     {
      "op": "replace",
      "offset": 313970,
      "old": "522e203030323436",
-     "new": "20206f7031722031"
+     "new": "20206f7031722032"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "cca9e0"
+     "new": "88b1e0"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "d8a9e0"
+     "new": "94b1e0"
     },
     {
      "op": "replace",
      "offset": 317408,
      "old": "78c0a3",
-     "new": "02aae0"
+     "new": "beb1e0"
     },
     {
      "op": "replace",
@@ -61,19 +61,19 @@
      "op": "replace",
      "offset": 416328,
      "old": "68ce9c",
-     "new": "0eaae0"
+     "new": "cab1e0"
     },
     {
      "op": "replace",
      "offset": 416360,
      "old": "48d09c",
-     "new": "5aaae0"
+     "new": "16b2e0"
     },
     {
      "op": "replace",
      "offset": 416392,
      "old": "04d19c",
-     "new": "34aae0"
+     "new": "f0b1e0"
     },
     {
      "op": "replace",
@@ -175,13 +175,13 @@
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e2744e"
+     "new": "21e25252"
     },
     {
      "op": "replace",
      "offset": 1279908,
      "old": "a5e60900",
-     "new": "21e2583a"
+     "new": "21e2363e"
     },
     {
      "op": "replace",
@@ -223,7 +223,7 @@
      "op": "replace",
      "offset": 1450940,
      "old": "ffe38801",
-     "new": "1fe378b5"
+     "new": "1fe3e2b8"
     },
     {
      "op": "replace",
@@ -289,8 +289,8 @@
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "2eb51621b1c9df842075328f346d8d9092deb50ecefb4c3480de719290e86957",
-     "size": 89840
+     "sha256": "a4bdcce559a62ef33a644952cdc0b407f8d96b9a2d69421adc457c70a09b0baf",
+     "size": 92620
     }
    ]
   },
@@ -443,8 +443,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "406ae3661435989f782da1cbe88fc757b06c57be0501fb7c1c0f5a26cc4769cd",
-  "sha256": "4e037a342db27244ad4db863ded47e023e893e210d1ed42634824a08cda5ac69",
-  "size": 12808229
+  "tar_sha256": "3e04e551d9e1384eb30dbd4800dc4f7de5d9e9722a1e264763f16434f0fea85a",
+  "sha256": "6dfdb643b2c8337304e2ff226e0c50f6b77aa20a56c5f815b3ffee6d1a5ea40e",
+  "size": 12808571
  }
 }

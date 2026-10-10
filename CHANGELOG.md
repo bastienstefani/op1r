@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-10 15:28 — op1r 2
+
+Output `6dfdb643b2c8337304e2ff226e0c50f6b77aa20a56c5f815b3ffee6d1a5ea40e`
+
+### Added
+- Euclid quick mute: Shift + G A B C D E (the last six white keys) mutes/unmutes slots 1–6, Shift + D# mutes or
+  unmutes all. A muted slot keeps running (playhead moves, green dots dimmed) but plays no notes. Works from any
+  screen while the sequencer is on.
+- Euclid settings are saved: note, steps, pulses, rotation, rate, gate, octave and mute of every slot, plus the
+  selected slot, per synth/drum. Saved in the background like the stock sequencers; slots come back stopped.
+
+### Changed
+- Boot screen version: `op1r 2`.
+
 ## 2026-10-10 14:15 — op1r 1
 
 Output `4e037a342db27244ad4db863ded47e023e893e210d1ed42634824a08cda5ac69`

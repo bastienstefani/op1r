@@ -24,7 +24,10 @@ with:
     assigns its note, at the octave of that moment
   - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press blue/green/white for
     page 2: rate (1/4 … 1/32, triplets), gate, octave
-  - runs at the OP-1 tempo, plays polyphonically and sends MIDI; settings are not saved yet
+  - **Shift + G A B C D E** (the last six white keys) mutes/unmutes slots 1–6, **Shift + D#** mutes/unmutes all;
+    a muted slot keeps running (dimmed dots) but plays nothing; works from any screen
+  - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
+    back stopped)
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -73,7 +76,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `4e037a342db27244ad4db863ded47e023e893e210d1ed42634824a08cda5ac69` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `6dfdb643b2c8337304e2ff226e0c50f6b77aa20a56c5f815b3ffee6d1a5ea40e` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
