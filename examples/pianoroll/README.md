@@ -27,9 +27,13 @@ Sur l'écran roll (séquenceur roll sélectionné) :
 | | Rotation | Appui |
 |---|---|---|
 | **Bleu** | déplace le curseur dans le temps (par pas de grille) | change la grille (1/4 → 1/8 → 1/16 → 1/32) |
-| **Vert** | fait défiler les hauteurs affichées | — |
+| **Vert** | fait défiler les hauteurs affichées | efface les notes sous le curseur |
 | **Blanc** | durée des nouvelles notes | change la vélocité (127 / 100 / 64) |
-| **Rouge** | longueur de la boucle | efface les notes sous le curseur |
+| **Orange** | longueur de la boucle | **lecture / arrêt** |
+
+- **HOLD** (encadré en haut à droite) : rouge atténué à l'arrêt, rouge vif en lecture. Le roll démarre à l'arrêt ;
+  tout arrêt externe (séquenceur coupé, changement de séquenceur ou de mode) le remet sur HOLD. La lecture repart
+  toujours du début de la boucle ; la tête de lecture n'est affichée qu'en lecture.
 
 - **Touche du clavier** : pose une note de cette hauteur au curseur, avec la durée courante, puis avance le
   curseur (saisie pas à pas). La note sonne en même temps.

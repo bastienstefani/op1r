@@ -11,7 +11,8 @@
  *   - time cursor (blue), pitch scroll (green), note length (white), loop length (red);
  *   - a keyboard key places a note of that pitch at the cursor with the current length (step input);
  *     Shift + key removes it;
- *   - blue press cycles the grid, white press the velocity, red press clears the cursor column;
+ *   - blue press cycles the grid, green press clears the cursor column, white press the velocity;
+ *   - orange press starts / stops playback (HOLD box: faded red when held, red when playing);
  *   - each note keeps its own start and length ("customizable duration"); the loop length is settable.
  * Saving to op1.db comes in step 3; until then the pattern is lost on power off.
  */
@@ -76,6 +77,7 @@ typedef struct {
     uint8_t  vel_i;                     /* index into VELS */
     int8_t   view_top;                  /* note number of the top grid row */
     uint8_t  inited;
+    volatile uint8_t run;               /* play requested (orange press); not saved: boots held */
     /* playback (written only by the sequencer thread) */
     uint16_t play_t;
     uint8_t  playing;
@@ -106,6 +108,7 @@ static void roll_defaults(Roll *R) {
     R->view_top = 72;
     R->play_t = 0;
     R->playing = 0;
+    R->run = 0;
     R->inited = 1;
 }
 
@@ -122,10 +125,15 @@ static void snd_off_all(Roll *R) {
 
 static void roll_tick(void *self, int32_t tick48) {
     Roll *R = &roll[fw_mode == 1];
-    uint16_t t = R->play_t;
+    uint16_t t;
     int i;
     (void) self; (void) tick48;
-    R->playing = 1;
+    if (!R->run) {                                  /* HOLD: release once, then wait for the orange press */
+        if (R->playing) { snd_off_all(R); R->play_t = 0; R->playing = 0; }
+        return;
+    }
+    if (!R->playing) { R->play_t = 0; R->playing = 1; }     /* start from the top of the loop */
+    t = R->play_t;
 
     for (i = 0; i < POLY; i++)                      /* note-off at gate end */
         if (R->snd[i].used && R->snd[i].off_t == t) {
@@ -157,6 +165,7 @@ static void roll_stop(void *self) {                 /* must be idempotent; relea
         snd_off_all(&roll[m]);
         roll[m].play_t = 0;
         roll[m].playing = 0;
+        roll[m].run = 0;                            /* any external stop puts the roll on HOLD */
     }
 }
 
@@ -241,6 +250,7 @@ static const uint8_t COL_BAR [4] = { 0x00, 0x52, 0x34, 0xff };
 static const uint8_t COL_NOTE[4] = { 0x00, 0xed, 0x95, 0xff };
 static const uint8_t COL_CUR [4] = { 0x4d, 0x9e, 0xff, 0xff };
 static const uint8_t COL_HEAD[4] = { 0xff, 0x3a, 0x5d, 0xff };
+static const uint8_t COL_HOLD[4] = { 0x5c, 0x17, 0x25, 0xff };   /* faded red: held */
 static const uint8_t COL_TEXT[4] = { 0xff, 0xff, 0xff, 0xff };
 
 static void hline(void *r, int32_t x0, int32_t x1, int32_t yc, int32_t th, const uint8_t c[4]) {
@@ -270,12 +280,27 @@ static void frac_str(char *out, unsigned ticks) {
 /* Own 7-segment digits and '/', drawn with the stock fw_line only (no op1r-internal font: op1r's code block,
  * and every function inside it, moves with each op1r version). x, y = top-left in px. */
 static const uint8_t SEG7[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };  /* a..g = bit 0..6 */
+/* letters as strokes in the same 5x8 box: x0,y0,x1,y1 in px, -1 ends */
+static const int8_t GL_H[] = { 0,0,0,8, 5,0,5,8, 0,4,5,4, -1 };
+static const int8_t GL_O[] = { 0,0,5,0, 5,0,5,8, 5,8,0,8, 0,8,0,0, -1 };
+static const int8_t GL_L[] = { 0,0,0,8, 0,8,5,8, -1 };
+static const int8_t GL_D[] = { 0,0,0,8, 0,0,3,0, 3,0,5,2, 5,2,5,6, 5,6,3,8, 3,8,0,8, -1 };
+static void strokes(void *r, int32_t X, int32_t Y, const int8_t *g, int32_t th, const uint8_t c[4]) {
+    for (; g[0] >= 0; g += 4) {
+        Pt p0 = { X + (g[0] << 10), Y + (g[1] << 10) }, p1 = { X + (g[2] << 10), Y + (g[3] << 10) };
+        fw_line(r, &p0, &p1, th, c);
+    }
+}
 static void seg_text(void *r, int x, int y, const char *s, const uint8_t c[4]) {
     const int32_t w = 5 << 10, h = 8 << 10, m = 4 << 10, th = 5 << 8;     /* 5x8 px glyphs, 1.25 px strokes */
     for (; *s; s++, x += 7) {
         int32_t X = x << 10, Y = y << 10;
         unsigned b;
         if (*s == '/') { Pt p0 = { X, Y + h }, p1 = { X + w, Y }; fw_line(r, &p0, &p1, th, c); continue; }
+        if (*s == 'H') { strokes(r, X, Y, GL_H, th, c); continue; }
+        if (*s == 'O') { strokes(r, X, Y, GL_O, th, c); continue; }
+        if (*s == 'L') { strokes(r, X, Y, GL_L, th, c); continue; }
+        if (*s == 'D') { strokes(r, X, Y, GL_D, th, c); continue; }
         if (*s < '0' || *s > '9') continue;
         b = SEG7[*s - '0'];
         if (b & 0x01) hline(r, X, X + w, Y, th, c);
@@ -343,7 +368,7 @@ static void roll_draw(void *self, int32_t dt) {
         vline(r, x, Y0, gy1, 2 << 9, COL_CUR);
     }
     /* playhead */
-    if (R->playing && R->play_t >= win_start && R->play_t < win_start + win_ticks) {
+    if (R->run && R->playing && R->play_t >= win_start && R->play_t < win_start + win_ticks) {
         int32_t x = X0 + (int32_t) ((int64_t) (R->play_t - win_start) * GW / win_ticks);
         vline(r, x, Y0, gy1, 3 << 9, COL_HEAD);
     }
@@ -352,6 +377,18 @@ static void roll_draw(void *self, int32_t dt) {
     frac_str(tmp, grid);              seg_text(r, 4,   5, tmp, COL_TEXT);
     frac_str(tmp, R->cur_len);        seg_text(r, 70,  5, tmp, COL_TEXT);
     num_str(tmp, R->loop_len / grid); seg_text(r, 140, 5, tmp, COL_TEXT);
+
+    /* HOLD box, top right: faded red while held, red while playing (orange press toggles) */
+    {
+        const uint8_t *c = R->run ? COL_HEAD : COL_HOLD;
+        const int32_t th = 5 << 8, e = th / 2;
+        const int32_t bx0 = 277 << 10, bx1 = 311 << 10, by0 = 2 << 10, by1 = 16 << 10;
+        hline(r, bx0 - e, bx1 + e, by0, th, c);
+        hline(r, bx0 - e, bx1 + e, by1, th, c);
+        vline(r, bx0, by0, by1, th, c);
+        vline(r, bx1, by0, by1, th, c);
+        seg_text(r, 281, 5, "HOLD", c);
+    }
 }
 
 /* ------------------------------------------------------------------ persistence (op1.db table "rollseq") */
@@ -535,14 +572,17 @@ static void roll_press(int enc) {
     case 2:                                             /* white: cycle velocity */
         R->vel_i = (R->vel_i + 1) % 3;
         break;
-    case 3:                                             /* red: clear the cursor column */
+    case 1:                                             /* green: clear the cursor column */
         for (i = 0; i < MAXNOTES; i++) {
             Note *n = &R->note[i];
             if (n->used && n->start <= R->cur_t && R->cur_t < n->start + (n->len ? n->len : 1))
                 n->used = 0;
         }
         break;
-    default: break;                                     /* green press reserved */
+    case 3:                                             /* orange: play / hold (the sequencer thread acts on it) */
+        R->run = !R->run;
+        return;                                         /* transport state is not saved */
+    default: break;
     }
     roll_dirty();
 }
