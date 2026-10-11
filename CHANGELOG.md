@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 15:29 — op1r 11
+
+Output `b43716c5df59c5eeedfa4b6687bbd2a05945f46fc89955bec91e2bd65ca716f3`
+
+### Added
+- **dots** step sequencer (first iteration): 6 slots playing together, up to 64 steps each, shown as rows of
+  16 dots. Blue cursor, Shift + white slot, red start/stop, Shift + red / Shift + C# start/stop all. Record mode
+  (press red): keys add triggers at the cursor step by step, red = trigger level, Shift + blue erases, green length
+  ±1, Shift + green extends to the next full row copying the row above. Mutes, 4 patterns, copy / paste / cut and
+  saving as in euclid. Step rate (1/16) and gate are fixed for now.
+
+### Changed
+- Boot screen version: `op1r 11`.
+
 ## 2026-10-11 11:28 — op1r 10
 
 Output `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758`

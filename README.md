@@ -50,6 +50,16 @@ with:
   - encoders: CC 102–105 = blue/green/white/red, relative (1–63 up, 65–127 down); works on every screen
   - mixer: CC 106–109 track 1–4 volume, 110–113 pan (64 = centre), 114–117 mute (≥ 64 = muted); CC 118 tape input
     level
+- **dots** step sequencer (pick it in the sequencer list), for synth and drums
+  - 6 slots playing at the same time, each up to 64 steps (4 rows of 16 dots); a step is empty (grey) or a
+    trigger (green) with its own note and level
+  - **blue** moves the cursor, **Shift + white** selects the slot, **red** starts / stops the slot,
+    **Shift + red** (or **Shift + C#**) starts / stops all slots
+  - **press red** for record mode: a note key puts a trigger at the cursor and moves on (the key sounds);
+    red sets the level of the trigger, **Shift + blue** erases while moving, **green** changes the length,
+    **Shift + green** extends to the next full row and copies the row above
+  - mutes (**Shift + G A B C D E**, D# all), 4 patterns (**Shift + F G A B**), lift / drop / scissors copy / paste /
+    cut the slot (Shift: whole pattern), all saved
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -98,7 +108,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `b43716c5df59c5eeedfa4b6687bbd2a05945f46fc89955bec91e2bd65ca716f3` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
