@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 22:01 — op1r 13
+
+Output `a0b657bc2a8df53c3ee1513538f23774ed83e59809a65ee987e639b660525dbc`
+
+### Added
+- quad LFO: **LFO types** on red: VOIC (per voice), FREE, GATE (restarts at note-on), MONO (restarts at every note-on,
+  shared), SHOT (one cycle, then holds), RAND (random value per note). Requested by a user (gate mode).
+- quad LFO: **phase offset** (Shift + blue, 45° steps).
+
+### Changed
+- quad LFO: new screen, one row per LFO with output, frequency, amount, target (symbol + knob colour dot, drum icon
+  on the drum page) and type. White now selects the target directly (12 targets, wraps); red selects the type.
+- quad LFO: frequency and amount have 64 steps each (as the encoder steps before); patches with older quad LFOs load
+  unchanged and switch to the new format when edited.
+- Boot screen version: `op1r 13`.
+
 ## 2026-10-11 17:35 — op1r 12
 
 Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c`

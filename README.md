@@ -23,14 +23,14 @@ with:
     encoder presses switch to a second page, red press freezes)
   - **reverb**: lush plate/hall reverb, a port of the Mutable Instruments Elements reverb (time, mix, diffusion,
     tone); generic FX screen
-- **quad** LFO: four LFOs in one slot, shown as four lanes over the full screen
-  - blue frequency (0.05–20 Hz), green amount (bipolar), white target, red destination
-  - works on synths and drums; targets: engine knob, envelope (synth ADSR, drum envelope) or FX knob
-  - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
-    to the target)
+- **quad** LFO: four LFOs in one slot, one row each: live output, frequency, amount, target and type
+  - blue frequency (0.05–20 Hz) or tempo division, green amount (±100 %), white target (synth / drum engine knob,
+    envelope A D S R or FX knob, shown as a symbol plus a dot in the knob colour), red type
+  - types: **VOIC** (per voice), **FREE** (free-running), **GATE** (restarts at note-on), **MONO** (restarts at every
+    note-on, shared), **SHOT** (one cycle after note-on, then holds), **RAND** (new random value per note)
   - press an encoder to select LFO 1–4
-  - hold **Shift** for a table of all four LFOs: blue frequency / tempo division, green smoothing, white waveform
-    (sine, triangle, ramp up/down, square, sample & hold), red sync to the OP-1 tempo (4/1 … 1/32, triplets)
+  - hold **Shift** for a table of all four LFOs: blue phase offset, green smoothing, white waveform (sine, triangle,
+    ramp up/down, square, sample & hold), red sync to the OP-1 tempo (4/1 … 1/32, triplets)
 - **euclid** sequencer, an extra sequencer next to the stock ones (pick it in the sequencer list), for synth and drums
   - 6 sequencer slots, each playing one note; **Shift + white** selects the slot, a note key on the euclid screen
     assigns its note, at the octave of that moment
@@ -118,7 +118,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `a0b657bc2a8df53c3ee1513538f23774ed83e59809a65ee987e639b660525dbc` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

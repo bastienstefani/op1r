@@ -13,43 +13,43 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "8f1dee2bfaab41b227eca54eef46fcaa53fa68bb37ec0fcdb5ef62860709c146",
+   "result_sha256": "c32e849b1e6353c987413046e26f513f9a7def53e942c34ff2e64be536169bdf",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "fb"
+     "new": "2d"
     },
     {
      "op": "replace",
      "offset": 12,
      "old": "d82221",
-     "new": "b8c423"
+     "new": "60ca23"
     },
     {
      "op": "replace",
      "offset": 313970,
      "old": "522e203030323436",
-     "new": "206f703172203132"
+     "new": "206f703172203133"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "e816e1"
+     "new": "901be1"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "f416e1"
+     "new": "9c1be1"
     },
     {
      "op": "replace",
      "offset": 317408,
      "old": "78c0a3",
-     "new": "1e17e1"
+     "new": "c61be1"
     },
     {
      "op": "replace",
@@ -60,20 +60,20 @@
     {
      "op": "replace",
      "offset": 416328,
-     "old": "68ce9c",
-     "new": "2a17e1"
+     "old": "68ce9c010000000030ce9c",
+     "new": "d21be10100000000903ae0"
     },
     {
      "op": "replace",
      "offset": 416360,
-     "old": "48d09c",
-     "new": "7617e1"
+     "old": "48d09c01000000002ece9c",
+     "new": "1e1ce10100000000d83ae0"
     },
     {
      "op": "replace",
      "offset": 416392,
-     "old": "04d19c",
-     "new": "5017e1"
+     "old": "04d19c01000000002cce9c",
+     "new": "f81be101000000001c3be0"
     },
     {
      "op": "replace",
@@ -133,13 +133,13 @@
      "op": "replace",
      "offset": 1055476,
      "old": "38080b10",
-     "new": "23e37627"
+     "new": "23e3ca29"
     },
     {
      "op": "replace",
      "offset": 1056444,
      "old": "01080710",
-     "new": "23e3a525"
+     "new": "23e3f927"
     },
     {
      "op": "replace",
@@ -193,13 +193,13 @@
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e20285"
+     "new": "21e25687"
     },
     {
      "op": "replace",
      "offset": 1279908,
      "old": "a5e60900",
-     "new": "21e2e670"
+     "new": "21e23a73"
     },
     {
      "op": "replace",
@@ -313,15 +313,15 @@
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "43474b237b2b2f24cbae81d30944a3855c332d7e63a27562b9110c18756abfe5",
-     "size": 172512
+     "sha256": "4b6c871ee39e6675d0afe672e10ca6276bc086549753ea0622d0c0258edd1622",
+     "size": 173960
     }
    ]
   },
   {
    "path": "content/op1_factory.db",
    "orig_sha256": "be4572298fe9dc83b106d5c4eaf1cc972280d97f028f3eaebc0c76dc68ac9cf0",
-   "result_sha256": "3160dd2bfad96e8bae5f980583c778c4ef898d272ea3a489715c719297a37dd6",
+   "result_sha256": "af555ac331a37a4a71c7c20c557a31948615fdb21069c440820e24cac7c177b8",
    "ops": [
     {
      "op": "replace",
@@ -351,19 +351,19 @@
      "op": "replace",
      "offset": 2052,
      "old": "0702dd",
-     "new": "08029b"
+     "new": "0802a7"
     },
     {
      "op": "replace",
      "offset": 2070,
      "old": "0000",
-     "new": "029b"
+     "new": "02a7"
     },
     {
      "op": "replace",
-     "offset": 2715,
-     "old": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-     "new": "40080400157d717561645b31303030302c2031363030302c2032323030302c2032383030302c2031363531322c2031373533362c2031383536302c2031393538345d"
+     "offset": 2727,
+     "old": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+     "new": "340804001565717561645b31392c2033312c2034322c2035342c2032343630382c2032343637322c2032343733362c2032343830305d"
     },
     {
      "op": "replace",
@@ -456,7 +456,7 @@
   {
    "path": "content/display/quadlfo.svg",
    "blob": "files/content_display_quadlfo.svg",
-   "sha256": "c3c7fa3dfb4703c2c073dfde8a1522a90545ee092c9daf92f433f220c4e35381",
+   "sha256": "97a28f6c391ca87272a1330c89d653a4c42b04070a7a7a84f7058017ea2dc62a",
    "template": "content/display/adsr.svg"
   },
   {
@@ -473,8 +473,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "69dc3ac3b1ad9eedf40897549e4fdad6b6e32b54b1868956376092584a955e37",
-  "sha256": "d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c",
-  "size": 12825577
+  "tar_sha256": "cc92e3c370b730ce1f2ec7b9b56c736a0dcf6d3067ce7693787e35027ce8693f",
+  "sha256": "a0b657bc2a8df53c3ee1513538f23774ed83e59809a65ee987e639b660525dbc",
+  "size": 12826262
  }
 }
