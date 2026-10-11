@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 11:28 — op1r 10
+
+Output `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758`
+
+### Added
+- **MIDI CC control** (USB MIDI, OP-1 MIDI channel):
+  - all front-panel keys except the keyboard: CC = key code + 5 (the OP-1 CTRL mode numbering), value ≥ 64 = press,
+    < 64 = release, so combinations like REC + PLAY or Shift + key work. Transport: CC 38 REC, 39 PLAY, 40 STOP
+  - the four encoders as relative CCs 102–105 (1–63 up, 65–127 down)
+  - mixer: CC 106–109 track volume, 110–113 track pan (64 = centre), 114–117 track mute; CC 118 tape input level
+  - CC 1–4 still go to the MIDI LFO; encoder presses are not mapped (CC 64 is the sustain pedal)
+
+### Changed
+- Boot screen version: `op1r 10`.
+- `build_patch.py` refuses local builds (build time on the boot screen); build with `make_firmware.py --opz --release`.
+
 ## 2026-10-11 09:20 — op1r 9
 
 Output `6057c2258b75741a69611b6f52cc577279e48be3fcbd3af025ccdc46cc2b64cd`
