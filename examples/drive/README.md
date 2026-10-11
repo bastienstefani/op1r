@@ -1,6 +1,6 @@
 # Exemple : effet de distorsion « drive »
 
-Distorsion pour l'OP-1 (R246), ajoutée **par-dessus op1r 10 et le piano roll** comme nouvelle entrée « drive » de la
+Distorsion pour l'OP-1 (R246), ajoutée **par-dessus op1r 12 et le piano roll** comme nouvelle entrée « drive » de la
 liste des effets. Le fonctionnement s'inspire du module Distortion de Serum (modes de waveshaping, drive, filtre
 avant ou après, mix). L'écran reprend son affichage (courbe de transfert, forme d'onde déformée) dans le langage
 visuel de l'OP-1 : fond noir, traits fins, une couleur par encodeur. Exemple d'étude pour
@@ -83,7 +83,7 @@ Exactement comme les effets d'op1r (tape, clouds, reverb), sur l'effet d'origine
 | mot `018f7ff8` | `case` 5 de ScreenId fx : notre écran (id `0xb`, celui des effets d'op1r) si l'effet courant est drive |
 | CALL `01a3bd58`, `019f07d2`, `019c2d3e`, `019c2e94` | construction et init des écrans, touches, encodeurs, enchaînés drive → piano roll → op1r |
 
-`build.sh` épingle le bloc de code d'op1r 10 par son sha256 (drive appelle ses fonctions internes) et vérifie
+`build.sh` épingle le bloc de code d'op1r 12 par son sha256 (drive appelle ses fonctions internes) et vérifie
 chaque site avant de construire.
 
 ## Fichiers
@@ -93,7 +93,7 @@ chaque site avant de construire.
 | `dsp.h` | le cœur audio, en virgule fixe (modes, filtre à variable d'état suréchantillonné 2×, mix, niveau) |
 | `ui.h`, `screen.h` | l'écran : police vectorielle, mise en page, courbe, ondes, réglages |
 | `drive.c` | les hooks : nom, audio, écran, touches, encodeurs |
-| `drive.ld` | lien avec le piano roll à `01e80000`, adresses R246 et op1r 10 |
+| `drive.ld` | lien avec le piano roll à `01e80000`, adresses R246 et op1r 12 |
 | `tables.h`, `gen_tables.py` | tables (sinus, drive, fréquence, niveau), générées |
 | `test_host.c` | test du DSP sur PC sous UBSan : toutes les combinaisons de réglages, pas de débordement |
 | `test_hooks.c` | test des hooks sur PC contre un firmware simulé |

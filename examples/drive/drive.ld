@@ -1,4 +1,4 @@
-/* Link drive together with the piano roll into one blob at 01e80000 (layout, R246 and op1r 10 symbols come
+/* Link drive together with the piano roll into one blob at 01e80000 (layout, R246 and op1r 12 symbols come
  * from the piano roll's script; build.sh passes -L ../pianoroll). */
 INCLUDE fw.ld
 
@@ -17,15 +17,15 @@ _fw_patch_drum    = 0x01ddd9a8;
 _fw_patch_set_fx  = 0x019ff664;
 _fw_base_screen_vt = 0x01911474;
 
-/* op1r 10 (build.sh pins op1r's whole block by its sha256, so these cannot have moved) */
-_op1r_fx_name_eq    = 0x01e00be8;
-_op1r_fx_mono       = 0x01e008d0;
-_op1r_fx_mono_pos   = 0x01e00734;
-_op1r_fx_stereo     = 0x01e00778;
-_op1r_fx_stereo_pos = 0x01e00760;
-_op1r_fx_screen     = 0x01e01c8c;
-_op1r_mono_cache    = 0x01e1678c;
-_op1r_stereo_cache  = 0x01e16788;
+/* op1r 12 (build.sh pins op1r's whole block by its sha256, so these cannot have moved) */
+_op1r_fx_name_eq    = 0x01e00d38;
+_op1r_fx_mono       = 0x01e00988;
+_op1r_fx_mono_pos   = 0x01e007ec;
+_op1r_fx_stereo     = 0x01e00830;
+_op1r_fx_stereo_pos = 0x01e00818;
+_op1r_fx_screen     = 0x01e02018;
+_op1r_mono_cache    = 0x01e1b00c;
+_op1r_stereo_cache  = 0x01e1b008;
 
 /* the chain on the shared sites: drive -> piano roll -> op1r -> stock */
 _dv_next_build_screens = _rp_build_screens;

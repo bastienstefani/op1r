@@ -21,12 +21,12 @@ LDR=$B/op1r/OP1_vdk.ldr
 
 # verify every op1r hook target we chain to is where fw.ld expects it
 check() { got=$($FWT branch "$LDR" "$1" -q); [ "$got" = "$2" ] || { echo "op1r target at $1 is $got, expected $2 - op1r version mismatch"; exit 1; }; }
-check 0x01a42a2e 0x01e00964     # idFromName  -> op1r
-check 0x01a422ec 0x01e009f8     # nameFromId  -> op1r
-check 0x01a3bd58 0x01e00dbc     # build screens
-check 0x019f07d2 0x01e0106c     # init screens
-check 0x019c2d3e 0x01e012a8     # key
-check 0x019c2e94 0x01e017e0     # encoder
+check 0x01a42a2e 0x01e00a1c     # idFromName  -> op1r
+check 0x01a422ec 0x01e00af8     # nameFromId  -> op1r
+check 0x01a3bd58 0x01e00f0c     # build screens
+check 0x019f07d2 0x01e0121c     # init screens
+check 0x019c2d3e 0x01e01468     # key
+check 0x019c2e94 0x01e01a80     # encoder
 check 0x01a0d1b0 0x01a46400     # arp instance (op1r leaves it on the stock getter)
 # the stock sequencer-clock reset we replace must be untouched (same bytes as R246)
 CLK=$(python3 -c "import sys; sys.path.insert(0,'$ROOT/tools'); import fwtool as T; d=open('$LDR','rb').read(); o=T.addr2off(list(T.ldr_blocks(d)),0x01a5e7d0); print(d[o:o+18].hex())")
@@ -59,5 +59,5 @@ python3 "$ROOT/tools/fwbuild.py" "$FW" --op1r -o "$OUT" \
     --call 0x019c2e94=$(sym rp_encoder) \
     --jump 0x01a5e7d0=$(sym rp_clock_reset) \
     --file "content/display/roll.svg=$HERE/roll.svg" \
-    --sql "content/op1_factory.db=INSERT INTO seq_types (id, type) VALUES (8, 'roll')" \
+    --sql "content/op1_factory.db=INSERT INTO seq_types (id, type) VALUES (9, 'roll')" \
     --text "0x018f738a=op1rroll"

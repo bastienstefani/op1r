@@ -48,7 +48,7 @@ extern void  fw_bg_register(void *saveable);                           /* 0193f0
 extern void  fw_bg_dirty(void *saveable);                              /* 0193ef3c */
 extern void  fw_free(void *p);                                         /* 01a5e310 (operator delete) */
 
-/* op1r 10 hooks we chain to: addresses in fw.ld, verified against the op1r image by build.sh */
+/* op1r 12 hooks we chain to: addresses in fw.ld, verified against the op1r image by build.sh */
 extern int32_t     op1r_id_from_name(const void *s);
 extern const char *op1r_name_from_id(int32_t id);
 extern void       *op1r_build_screens(void);
@@ -556,7 +556,7 @@ int32_t rp_id_from_name(const te_string *s) {
     int m = (fw_mode == 1);
     if (streq(te_cstr(s), "roll")) {
         if (!roll[m].inited) roll_defaults(&roll[m]);
-        op1r_id_from_name(&host_name);  /* side effect: op1r clears its euclid flag for this mode */
+        op1r_id_from_name(&host_name);  /* side effect: op1r clears its euclid / dots flags for this mode */
         roll_flag[m] = 1;
         return HOST_ID;
     }

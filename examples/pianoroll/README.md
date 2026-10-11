@@ -11,8 +11,11 @@ Un hook de plus, sur une fonction qu'op1r ne touche pas : la remise à zéro de 
 (`01a5e7d0`) est remplacée par une copie qui fait les mêmes écritures et signale la remise à zéro au roll, pour
 le départ calé sur le temps. `build.sh` vérifie que ses octets sont ceux d'origine.
 
-**Construit sur op1r 10.** Les adresses des hooks d'op1r sont re-dérivées de l'image op1r 10 (le bloc de code
+**Construit sur op1r 12.** Les adresses des hooks d'op1r sont re-dérivées de l'image op1r 12 (le bloc de code
 d'op1r change à chaque version) ; `build.sh` les vérifie et refuse de construire si elles ne correspondent plus.
+op1r 11 a pris l'id 8 de `seq_types` pour dots : roll a maintenant l'id 9 (seul le nom est enregistré dans
+`op1.db`, donc rien ne change pour un roll déjà sélectionné). dots est greffé sur finger comme euclid, roll sur
+arpeggio : pas de collision.
 
 ## Étapes
 
@@ -95,6 +98,6 @@ dépend pas du système) et faire l'étape 1. En dernier recours, le « factory 
 | Fichier | Rôle |
 |---|---|
 | `roll.c` | le séquenceur : hooks d'intégration, lecteur (vtable 7 méthodes), écran (dessin par code), sauvegarde, calage sur le temps |
-| `fw.ld` | lien à `01e80000`, adresses du firmware R246 et des hooks op1r 10 |
+| `fw.ld` | lien à `01e80000`, adresses du firmware R246 et des hooks op1r 12 |
 | `roll.svg` | écran presque vide (grille et notes dessinées par le code) |
 | `build.sh` | vérifie les cibles op1r et la remise à zéro d'horloge d'origine, compile, lie, puis `tools/fwbuild.py` (blob + hooks + ligne SQL + SVG) |

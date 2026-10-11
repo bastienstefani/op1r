@@ -37,10 +37,10 @@ _fw_bg_register   = 0x0193f010;
 _fw_bg_dirty      = 0x0193ef3c;
 _fw_free          = 0x01a5e310;
 
-/* op1r 10 hook targets we chain to (build.sh verifies these against the image) */
-_op1r_id_from_name  = 0x01e00964;
-_op1r_name_from_id  = 0x01e009f8;
-_op1r_build_screens = 0x01e00dbc;
-_op1r_init_screens  = 0x01e0106c;
-_op1r_key           = 0x01e012a8;
-_op1r_encoder       = 0x01e017e0;
+/* op1r 12 hook targets we chain to (build.sh verifies these against the image) */
+_op1r_id_from_name  = 0x01e00a1c;
+_op1r_name_from_id  = 0x01e00af8;
+_op1r_build_screens = 0x01e00f0c;
+_op1r_init_screens  = 0x01e0121c;
+_op1r_key           = 0x01e01468;
+_op1r_encoder       = 0x01e01a80;

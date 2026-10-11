@@ -1,4 +1,4 @@
-/* drive: a Serum-style distortion FX for the OP-1 (R246), built on top of op1r 10 and the piano roll.
+/* drive: a Serum-style distortion FX for the OP-1 (R246), built on top of op1r 12 and the piano roll.
  *
  * Study example for docs/firmware-r246.md.  The original op1_246.op1 and the op1r image can always be
  * reflashed, so a lock-up only costs a reflash.
@@ -51,7 +51,7 @@ extern void *fw_scr_raster(void);                                      /* 01a3b4
 extern void  fw_line(void *raster, const Pt *a, const Pt *b, int32_t width, const uint8_t rgba[4]); /* 01a24a4c */
 extern void  fw_screen_ctor(void *obj, int32_t id, const char *svg);   /* 01a3bab0 */
 
-/* op1r 10: addresses in drive.ld, verified by build.sh (it pins op1r's block by its sha256) */
+/* op1r 12: addresses in drive.ld, verified by build.sh (it pins op1r's block by its sha256) */
 extern int32_t op1r_fx_name_eq(const char *table_name, const te_string *db_name);
 extern void    op1r_fx_mono(void *self, int16_t *buf, const int16_t *p);
 extern void    op1r_fx_mono_pos(void *self, int32_t pos);
