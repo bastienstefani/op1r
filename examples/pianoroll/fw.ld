@@ -27,6 +27,9 @@ _fw_screen_ctor   = 0x01a3bab0;
 _fw_note_on       = 0x01a85750;
 _fw_note_off      = 0x01a85840;
 _fw_arp_instance  = 0x01a46400;
+_fw_synth_slot    = 0xff8016d4;
+_fw_synth_oct     = 0x01dfe4e0;
+_fw_text          = 0x01e026f0;
 
 /* op1r 5 hook targets we chain to (build.sh verifies these against the image) */
 _op1r_id_from_name  = 0x01e007a8;

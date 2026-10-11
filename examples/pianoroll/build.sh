@@ -32,7 +32,8 @@ check 0x01a0d1b0 0x01a46400     # arp instance (op1r leaves it on the stock gett
 # compile and link at LOAD
 "${X}gcc" -O2 -ffreestanding -fno-builtin -nostdlib -ffunction-sections -fdata-sections -Wall -Wextra \
     -c "$HERE/roll.c" -o "$B/roll.o"
-"${X}ld" -T "$HERE/fw.ld" "$B/roll.o" -o "$B/roll.elf"
+LIBGCC=$("${X}gcc" -print-libgcc-file-name)        # __divsi3/__modsi3/__muldi3/__divdi3 etc.
+"${X}ld" -T "$HERE/fw.ld" "$B/roll.o" "$LIBGCC" -o "$B/roll.elf"
 "${X}objcopy" -O binary -j .blob "$B/roll.elf" "$B/roll.bin"
 "${X}objdump" -d "$B/roll.elf" > "${OUT%.op1}.dis"
 sym() { "${X}nm" "$B/roll.elf" | awk -v s="_$1" '$3==s {print "0x"$1}'; }

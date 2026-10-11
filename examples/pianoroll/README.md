@@ -10,13 +10,31 @@ entre « roll » et euclid (id, drapeau, écran et table distincts).
 
 ## Étapes
 
-- **Étape 1 (ici)** : « roll » apparaît dans la liste et est sélectionnable ; un écran affiche une grille
-  hauteur × temps avec une tête de lecture rouge qui défile ; un motif de démo d'une mesure tourne en boucle,
-  joué sur le moteur interne et envoyé en MIDI, avec extinction propre des notes à l'arrêt / au changement de
-  séquenceur. **Pas encore** : édition, longueur de boucle réglable, sauvegarde.
-- Étape 2 : édition (curseur, pose/suppression de notes, durée par note, longueur de boucle) aux encodeurs et au
-  clavier.
+- Étape 1 (fait, testée sur matériel) : « roll » dans la liste, écran avec grille et tête de lecture, motif de
+  démo en boucle.
+- **Étape 2 (ici)** : vrai modèle de notes avec lecture **polyphonique** et **édition**. Chaque note garde sa
+  propre position et sa propre durée ; la longueur de boucle est réglable. **Pas encore** : la sauvegarde (le
+  motif est perdu à l'extinction).
 - Étape 3 : sauvegarde par mode dans `op1.db`, comme euclid.
+
+## Commandes (étape 2)
+
+Sur l'écran roll (séquenceur roll sélectionné) :
+
+| | Rotation | Appui |
+|---|---|---|
+| **Bleu** | déplace le curseur dans le temps (par pas de grille) | change la grille (1/4 → 1/8 → 1/16 → 1/32) |
+| **Vert** | fait défiler les hauteurs affichées | — |
+| **Blanc** | durée des nouvelles notes | change la vélocité (127 / 100 / 64) |
+| **Rouge** | longueur de la boucle | efface les notes sous le curseur |
+
+- **Touche du clavier** : pose une note de cette hauteur au curseur, avec la durée courante, puis avance le
+  curseur (saisie pas à pas). La note sonne en même temps.
+- **Shift + touche** : efface la note de cette hauteur sous le curseur.
+- L'octave du clavier (flèches gauche/droite) décale la hauteur posée, comme d'habitude.
+
+En-tête (police vectorielle d'op1r, chiffres et quelques symboles) : grille, durée de note, longueur de boucle
+en nombre de pas.
 
 ## Essai
 
@@ -31,17 +49,19 @@ entre « roll » et euclid (id, drapeau, écran et table distincts).
 3. Lancer le séquenceur : le motif de démo tourne en boucle. L'écran montre la grille et la tête de lecture.
    Fonctionne en mode synth comme en mode drum (motif différent).
 
-## À regarder pour tes retours
+## À regarder pour tes retours (étape 2)
 
-- L'appareil démarre-t-il normalement (pas de blocage) et `roll` est-il bien dans la liste ?
-- La sélection de `roll` est-elle stable (y compris après un redémarrage) ?
-- Le motif de démo joue-t-il en boucle, au bon tempo, et s'arrête-t-il proprement quand on coupe le séquenceur
-  ou qu'on change de séquenceur (pas de note bloquée) ?
-- L'écran s'affiche-t-il correctement (grille, notes, tête de lecture) ? Lisibilité, position, taille ?
+- Poser des notes au clavier : apparaissent-elles au bon endroit, à la bonne hauteur, avec la bonne durée ?
+- Le curseur (bleu), la grille (appui bleu), la durée (blanc), la longueur de boucle (rouge) répondent-ils comme
+  attendu ? Le défilement des hauteurs (vert) ?
+- La lecture est-elle bien polyphonique (plusieurs notes en même temps) et au bon tempo ? Pas de note bloquée en
+  bouclant, en coupant, ou en changeant de séquenceur ?
+- Shift + touche efface-t-il la bonne note ? L'appui rouge efface-t-il la colonne du curseur ?
+- L'en-tête (grille / durée / longueur) est-il lisible et juste ?
 - Euclid et les séquenceurs d'origine marchent-ils toujours ?
 
-Limite connue de l'étape 1 : changer l'octave pendant que la démo joue peut laisser une note bloquée (même
-limite que l'euclid d'op1r ; corrigée dans une étape ultérieure).
+Limites connues de l'étape 2 : pas encore de sauvegarde (motif perdu à l'extinction) ; changer l'octave pendant
+la lecture peut laisser une note bloquée (comme l'euclid d'op1r).
 
 ## Fichiers
 

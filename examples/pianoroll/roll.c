@@ -1,18 +1,19 @@
-/* Piano-roll sequencer for the OP-1 (R246), built on top of op1r.  STEP 1: skeleton.
+/* Piano-roll sequencer for the OP-1 (R246), built on top of op1r.  STEP 2: editing.
  *
  * Study example for docs/firmware-r246.md.  NOT TESTED ON HARDWARE.  The original op1_246.op1 and the op1r
  * image can always be reflashed, so a lock-up only costs a reflash.
  *
- * This step registers a new sequencer "roll" next to op1r's euclid, hosted on the stock arpeggio (internal id 5,
- * screen id 0x2c).  It:
- *   - makes "roll" selectable in the sequencer list (the (8,'roll') row is added to op1_factory.db by build.sh),
- *   - installs a custom screen that draws a pitch x time grid with a moving playhead,
- *   - plays a fixed one-bar demo pattern in a loop (so you can hear and see that playback works),
- *   - sends the notes to the internal engine and MIDI, and releases them cleanly on stop / sequencer change.
- * Editing, custom loop length and saving come in the next steps.
+ * New sequencer "roll" hosted on the stock arpeggio (internal id 5, screen id 0x2c), exactly as op1r hosts
+ * euclid on finger (id 3, screen 0x2d).  Every hook chains to op1r's so euclid keeps working.
  *
- * Integration mirrors op1r's euclid exactly (euclid is hosted on finger id 3, screen id 0x2d, and is flash
- * tested).  Every hook chains to op1r's hook so euclid keeps working.
+ * Step 1 (done, flash tested): the entry appears and is selectable, a grid screen shows a moving playhead, a
+ * demo pattern loops.  Step 2 (this file): a real note model with polyphonic playback and editing:
+ *   - time cursor (blue), pitch scroll (green), note length (white), loop length (red);
+ *   - a keyboard key places a note of that pitch at the cursor with the current length (step input);
+ *     Shift + key removes it;
+ *   - blue press cycles the grid, white press the velocity, red press clears the cursor column;
+ *   - each note keeps its own start and length ("customizable duration"); the loop length is settable.
+ * Saving to op1.db comes in step 3; until then the pattern is lost on power off.
  */
 #include <stdint.h>
 
@@ -20,19 +21,22 @@
 typedef struct { int32_t x, y; } Pt;                 /* screen coords, 22.10 fixed point (1 px = 1<<10) */
 typedef struct { int32_t note, vel; uint8_t midi, pad[3]; int32_t user; } MidiNote;  /* 16 bytes */
 
-extern volatile int32_t  fw_mode;                    /* 01de4c40: 0 = synth, 1 = drum (current mode) */
+extern volatile int32_t  fw_mode;                    /* 01de4c40: 0 = synth, 1 = drum */
 extern volatile int32_t  fw_cur_screen;              /* 018b65c8: id of the screen being shown */
 extern void             *fw_screen_reg[];            /* 01df4e54: screen registry, indexed by screen id */
 extern volatile uint8_t  op1r_euclid_flag[];         /* 01e158d0: op1r's euclid-active flag [synth, drum] */
+extern volatile int32_t  fw_synth_slot;              /* ff8016d4: current synth sound slot */
+extern volatile int8_t   fw_synth_oct[];             /* 01dfe4e0: per-slot synth octave, -4..+4 */
 
 extern void *fw_scr_raster(void);                                      /* 01a3b490 */
 extern void  fw_line(void *raster, const Pt *a, const Pt *b, int32_t width, const uint8_t rgba[4]); /* 01a24a4c */
+extern void  fw_text(void *raster, int32_t x, int32_t y, int32_t scale,
+                     const char *s, int32_t width, const uint8_t rgba[4]);              /* 01e026f0 (op1r font) */
 extern void  fw_screen_ctor(void *obj, int32_t id, const char *svg);   /* 01a3bab0 */
 extern void  fw_note_on(const MidiNote *, int32_t drum_semi);          /* 01a85750 */
 extern void  fw_note_off(const MidiNote *);                            /* 01a85840 */
 extern void *fw_arp_instance(void);                                    /* 01a46400 (stock arp singleton) */
 
-/* op1r hooks we chain to (fixed in the op1r 5 image; build.sh checks them) */
 extern int32_t     op1r_id_from_name(const void *s);   /* 01e007a8 */
 extern const char *op1r_name_from_id(int32_t id);      /* 01e0083c */
 extern void       *op1r_build_screens(void);           /* 01e00c04 */
@@ -40,167 +44,308 @@ extern void        op1r_init_screens(void);            /* 01e00eb4 */
 extern void        op1r_key(int32_t key, int32_t pressed);   /* 01e010f0 */
 extern void        op1r_encoder(int32_t enc, int16_t *delta);/* 01e01384 */
 
-#define HOST_ID      5       /* internal id of arpeggio (we host on it) */
-#define HOST_SCREEN  0x2c    /* arpeggio's screen id */
+#define HOST_ID      5
+#define HOST_SCREEN  0x2c
 
-/* a std::string: inline buffer at +4 when capacity (+0x18) < 16, else a pointer; length at +0x14 */
 typedef struct { uint32_t a; union { char buf[16]; char *ptr; } u; uint32_t len, cap; } te_string;
 static const char *te_cstr(const te_string *s) { return s->cap < 16 ? s->u.buf : s->u.ptr; }
 static int streq(const char *a, const char *b) { while (*a && *a == *b) { a++; b++; } return *a == *b; }
 
-/* ------------------------------------------------------------------ state (zeroed at load) */
-#define NSTEPS         16
-#define TICKS_PER_STEP 24    /* 1/16 note = 96/4 ticks; the tick slot is called 96x per quarter */
+/* ------------------------------------------------------------------ model (zeroed at load) */
+#define MAXNOTES   128                  /* per mode */
+#define POLY       16                   /* max notes sounding at once */
+#define PPQ        96                   /* ticks per quarter note (the tick slot runs 96x per quarter) */
+#define MAXLOOP    (PPQ * 64)           /* 16 bars of 4/4 */
 
-static uint8_t  roll_flag[2];        /* roll active for [synth, drum] */
-static uint8_t  roll_ready;          /* screen built and initialised */
-static void    *roll_stock_arp_scr;  /* arpeggio's own screen object (to swap back) */
+typedef struct { uint16_t start, len; uint8_t pitch, vel, used, pad; } Note;   /* 8 bytes */
 
-static uint32_t roll_tick_count[2];
-static uint8_t  roll_playstep[2];
-static uint8_t  roll_on_note[2];     /* 0 = none, else sounding note + 1 */
+static const uint16_t GRIDS[4] = { PPQ, PPQ / 2, PPQ / 4, PPQ / 8 };   /* 1/4 1/8 1/16 1/32 */
+static const uint8_t  VELS[3]  = { 127, 100, 64 };
 
-/* one-bar demo pattern per mode; -1 = rest.  Values are engine note numbers (synth: 0..127; drum: 53..76). */
-static const signed char demo[2][NSTEPS] = {
-    { 60, -1, 64, -1, 67, -1, 64, -1, 69, -1, 67, 64, 62, -1, 60, -1 },   /* synth */
-    { 53, -1, -1, 55, 53, -1, 55, -1, 53, -1, -1, 55, 53, 55, 53, -1 },   /* drum  */
-};
-static const int32_t disp_top[2] = { 72, 60 };   /* top grid row note, per mode */
+typedef struct {
+    Note     note[MAXNOTES];
+    uint16_t loop_len;                  /* ticks */
+    uint16_t cur_t;                     /* time cursor, ticks */
+    uint16_t cur_len;                   /* length applied to new notes */
+    uint8_t  grid_i;                    /* index into GRIDS */
+    uint8_t  vel_i;                     /* index into VELS */
+    int8_t   view_top;                  /* note number of the top grid row */
+    uint8_t  inited;
+    /* playback (written only by the sequencer thread) */
+    uint16_t play_t;
+    uint8_t  playing;
+    struct { uint8_t note, used; uint16_t off_t; } snd[POLY];
+} Roll;
 
-/* screen object (16 bytes: doc, id, loader, vptr) built by fw_screen_ctor, plus a RAM vtable copy */
+static Roll roll[2];                    /* [synth, drum] */
+
+static uint8_t  roll_ready;
+static void    *roll_stock_arp_scr;
+static uint8_t  roll_flag[2];
+
 static uint32_t roll_scr_obj[4];
 static uint32_t roll_scr_vt[10];
 
-/* ------------------------------------------------------------------ playback */
-static void note_off(int m) {
-    if (roll_on_note[m]) {
-        MidiNote mn = { roll_on_note[m] - 1, 100, 1, {0,0,0}, 0 };
-        fw_note_off(&mn);
-        roll_on_note[m] = 0;
-    }
+static uint16_t grid_of(Roll *R) { return GRIDS[R->grid_i & 3]; }
+
+static void roll_defaults(Roll *R) {
+    int i;
+    for (i = 0; i < MAXNOTES; i++) R->note[i].used = 0;
+    for (i = 0; i < POLY; i++) R->snd[i].used = 0;
+    R->grid_i = 2;                      /* 1/16 */
+    R->vel_i = 1;                       /* 100 */
+    R->loop_len = PPQ / 4 * 16;         /* one bar of 16 steps */
+    R->cur_len = PPQ / 4;
+    R->cur_t = 0;
+    R->view_top = 72;
+    R->play_t = 0;
+    R->playing = 0;
+    R->inited = 1;
+}
+
+/* ------------------------------------------------------------------ playback (sequencer thread) */
+static void snd_off_all(Roll *R) {
+    int i;
+    for (i = 0; i < POLY; i++)
+        if (R->snd[i].used) {
+            MidiNote mn = { R->snd[i].note, 100, 1, {0,0,0}, 0 };
+            fw_note_off(&mn);
+            R->snd[i].used = 0;
+        }
 }
 
 static void roll_tick(void *self, int32_t tick48) {
-    int m = (fw_mode == 1);
-    uint32_t t = roll_tick_count[m];
+    Roll *R = &roll[fw_mode == 1];
+    uint16_t t = R->play_t;
+    int i;
     (void) self; (void) tick48;
-    if (t % TICKS_PER_STEP == 0) {
-        int step = (t / TICKS_PER_STEP) % NSTEPS;
-        note_off(m);
-        int n = demo[m][step];
-        if (n >= 0 && n < 128) {                 /* fw_note_on asserts 0<=note<128, so guard it */
-            MidiNote mn = { n, 100, 1, {0,0,0}, 0 };
-            fw_note_on(&mn, 0);
-            roll_on_note[m] = n + 1;
+    R->playing = 1;
+
+    for (i = 0; i < POLY; i++)                      /* note-off at gate end */
+        if (R->snd[i].used && R->snd[i].off_t == t) {
+            MidiNote mn = { R->snd[i].note, 100, 1, {0,0,0}, 0 };
+            fw_note_off(&mn);
+            R->snd[i].used = 0;
         }
-        roll_playstep[m] = step;
+    for (i = 0; i < MAXNOTES; i++) {                /* note-on at start */
+        Note *n = &R->note[i];
+        if (n->used && n->start == t && n->start < R->loop_len && n->pitch < 128) {
+            uint16_t off = n->start + (n->len ? n->len : 1);
+            int j;
+            if (off > R->loop_len) off = R->loop_len;
+            { MidiNote mn = { n->pitch, n->vel ? n->vel : 100, 1, {0,0,0}, 0 }; fw_note_on(&mn, 0); }
+            for (j = 0; j < POLY; j++)
+                if (!R->snd[j].used) { R->snd[j].note = n->pitch; R->snd[j].off_t = off; R->snd[j].used = 1; break; }
+        }
     }
-    if (++roll_tick_count[m] >= TICKS_PER_STEP * NSTEPS)
-        roll_tick_count[m] = 0;
+    if (++R->play_t >= R->loop_len) {               /* wrap: release everything to avoid hangs */
+        R->play_t = 0;
+        snd_off_all(R);
+    }
 }
 
-static void roll_stop(void *self) {              /* release everything; must be idempotent */
+static void roll_stop(void *self) {                 /* must be idempotent; releases both modes */
+    int m;
     (void) self;
-    for (int m = 0; m < 2; m++) {
-        note_off(m);
-        roll_tick_count[m] = 0;
-        roll_playstep[m] = 0;
+    for (m = 0; m < 2; m++) {
+        snd_off_all(&roll[m]);
+        roll[m].play_t = 0;
+        roll[m].playing = 0;
     }
 }
 
-static int32_t roll_key_down(void *self, int32_t key, int32_t shift) {
-    (void) self; (void) key; (void) shift;
-    return 0;                                    /* step 1: let the keyboard sound live */
+/* ------------------------------------------------------------------ editing (KeyHandler thread) */
+static int note_at(Roll *R, int pitch, uint16_t t) {    /* index of a used note of this pitch covering t, or -1 */
+    int i;
+    for (i = 0; i < MAXNOTES; i++) {
+        Note *n = &R->note[i];
+        if (n->used && n->pitch == pitch && n->start <= t && t < n->start + (n->len ? n->len : 1))
+            return i;
+    }
+    return -1;
 }
+
+static void place_note(Roll *R, int pitch, uint16_t t, uint16_t len, uint8_t vel) {
+    int i, slot = -1;
+    if (pitch < 0 || pitch > 127) return;
+    for (i = 0; i < MAXNOTES; i++)                      /* reuse a note with the same start+pitch */
+        if (R->note[i].used && R->note[i].pitch == pitch && R->note[i].start == t) { slot = i; break; }
+    if (slot < 0)
+        for (i = 0; i < MAXNOTES; i++) if (!R->note[i].used) { slot = i; break; }
+    if (slot < 0) return;                               /* full: ignore */
+    R->note[slot].used = 0;                             /* publish fields before marking used */
+    R->note[slot].start = t;
+    R->note[slot].len = len;
+    R->note[slot].pitch = pitch;
+    R->note[slot].vel = vel;
+    R->note[slot].used = 1;
+}
+
+/* player key_down: on the roll screen, a key places a note (Shift removes); otherwise it sounds normally. */
+static int32_t roll_key_down(void *self, int32_t key, int32_t shift) {
+    Roll *R = &roll[fw_mode == 1];
+    int pitch;
+    (void) self;
+    if (!(roll_ready && fw_cur_screen == HOST_SCREEN && roll_flag[fw_mode == 1]))
+        return 0;                                       /* not editing: let it sound live */
+    if (key < 0 || key > 23) return 0;
+    pitch = key + 53;
+    if (fw_mode == 0) {                                 /* synth: apply the keyboard octave */
+        int oct = fw_synth_oct[fw_synth_slot & 7];
+        pitch += 12 * oct;
+    }
+    if (pitch < 0 || pitch > 127) return shift ? 1 : 0;
+    if (shift) {
+        int i = note_at(R, pitch, R->cur_t);
+        if (i >= 0) R->note[i].used = 0;
+        return 1;                                       /* swallow: no live sound on delete */
+    }
+    place_note(R, pitch, R->cur_t, R->cur_len, VELS[R->vel_i % 3]);
+    R->view_top = (int8_t) (pitch + 2 > 127 ? 127 : pitch + 2);     /* keep the note in view */
+    R->cur_t = (uint16_t) ((R->cur_t + R->cur_len) % R->loop_len);  /* step input: advance */
+    return 0;                                           /* also sound it live as feedback */
+}
+
 static void roll_nop(void) {}
 
-/* player vtable: 8 slots of {int32 this-adjust, fn}; adjusts stay 0 */
+/* ------------------------------------------------------------------ player vtable */
 static const void *roll_player_vt[16] = {
-    0, 0,                        /* +00 */
+    0, 0,
     0, (void*) roll_nop,         /* +0c dtor */
     0, (void*) roll_key_down,    /* +14 key down */
     0, (void*) roll_nop,         /* +1c key up */
-    0, (void*) roll_stop,        /* +24 leave mode (release all, safe superset) */
+    0, (void*) roll_stop,        /* +24 leave mode */
     0, (void*) roll_tick,        /* +2c tick */
     0, (void*) roll_nop,         /* +34 frame */
     0, (void*) roll_stop,        /* +3c stop */
 };
 static const void *roll_player[1] = { roll_player_vt };
 
-/* ------------------------------------------------------------------ screen */
-#define X0   (16 << 10)
-#define Y0   (16 << 10)
-#define RH   (8  << 10)
-#define GW   (300 << 10)           /* grid width */
-#define SW   (GW / NSTEPS)
+/* ------------------------------------------------------------------ screen (display thread) */
+#define X0    (14 << 10)
+#define Y0    (22 << 10)
+#define ROWS  16
+#define RH    (8 << 10)
+#define GW    (300 << 10)
+#define WINS  16                        /* visible grid columns */
 
 static const uint8_t COL_GRID[4] = { 0x6f, 0x71, 0x73, 0xff };
+static const uint8_t COL_BAR [4] = { 0x00, 0x52, 0x34, 0xff };
 static const uint8_t COL_NOTE[4] = { 0x00, 0xed, 0x95, 0xff };
+static const uint8_t COL_CUR [4] = { 0x4d, 0x9e, 0xff, 0xff };
 static const uint8_t COL_HEAD[4] = { 0xff, 0x3a, 0x5d, 0xff };
+static const uint8_t COL_TEXT[4] = { 0xff, 0xff, 0xff, 0xff };
 
 static void hline(void *r, int32_t x0, int32_t x1, int32_t yc, int32_t th, const uint8_t c[4]) {
-    Pt a = { x0, yc }, b = { x1, yc };
-    fw_line(r, &a, &b, th, c);
+    Pt a = { x0, yc }, b = { x1, yc }; fw_line(r, &a, &b, th, c);
 }
 static void vline(void *r, int32_t xc, int32_t y0, int32_t y1, int32_t th, const uint8_t c[4]) {
-    Pt a = { xc, y0 }, b = { xc, y1 };
-    fw_line(r, &a, &b, th, c);
+    Pt a = { xc, y0 }, b = { xc, y1 }; fw_line(r, &a, &b, th, c);
+}
+
+/* note value text like "1/16" into a 5-char buffer */
+static void frac_str(char *out, uint16_t ticks) {
+    int d = ticks ? (PPQ * 4) / ticks : 0;              /* 96->4, 48->8, 24->16, 12->32 */
+    out[0] = '1'; out[1] = '/';
+    if (d >= 10) { out[2] = '0' + d / 10; out[3] = '0' + d % 10; out[4] = 0; }
+    else         { out[2] = '0' + d; out[3] = 0; }
+}
+static void num_str(char *out, int v) {                 /* up to 3 digits */
+    int i = 0; char t[4];
+    if (v <= 0) { out[0] = '0'; out[1] = 0; return; }
+    while (v && i < 3) { t[i++] = '0' + v % 10; v /= 10; }
+    { int j = 0; while (i) out[j++] = t[--i]; out[j] = 0; }
 }
 
 static void roll_draw(void *self, int32_t dt) {
+    Roll *R;
     void *r;
-    int m, s, top;
+    int m, i, s, win_ticks, win_start, grid, gy1;
+    char tmp[6];
     (void) self; (void) dt;
     if (!roll_ready) return;
     r = fw_scr_raster();
     if (!r) return;
     m = (fw_mode == 1);
-    top = disp_top[m];
+    R = &roll[m];
+    grid = grid_of(R);
+    win_ticks = WINS * grid;
+    gy1 = (22 + ROWS * 8) << 10;
 
-    for (s = 0; s <= NSTEPS; s++)                /* vertical grid lines */
-        vline(r, X0 + s * SW, Y0, Y0 + NSTEPS * RH, (s % 4 == 0 ? (2 << 9) : (1 << 9)), COL_GRID);
+    /* horizontal scroll so the cursor stays on screen */
+    win_start = (R->cur_t / win_ticks) * win_ticks;
 
-    for (s = 0; s < NSTEPS; s++) {               /* demo notes as filled bars */
-        int n = demo[m][s];
-        int row = top - n;
-        if (n >= 0 && row >= 0 && row < NSTEPS) {
-            int32_t yc = Y0 + row * RH + RH / 2;
-            hline(r, X0 + s * SW + (1 << 10), X0 + (s + 1) * SW - (1 << 10), yc, RH - (2 << 10), COL_NOTE);
-        }
+    /* vertical grid: one line per grid step, brighter on the beat */
+    for (s = 0; s <= WINS; s++) {
+        int32_t x = X0 + (int32_t) ((int64_t) s * grid * GW / win_ticks);
+        int beat = ((win_start + s * grid) % PPQ) == 0;
+        vline(r, x, Y0, gy1, beat ? (2 << 9) : (1 << 9), COL_GRID);
+    }
+    /* a faint baseline every octave (C) */
+    for (i = 0; i < ROWS; i++) {
+        int note = R->view_top - i;
+        if (note >= 0 && note % 12 == 0)
+            hline(r, X0, X0 + GW, Y0 + i * RH + RH, 1 << 9, COL_BAR);
     }
 
-    vline(r, X0 + roll_playstep[m] * SW + SW / 2, Y0, Y0 + NSTEPS * RH, (3 << 9), COL_HEAD);
+    /* notes */
+    for (i = 0; i < MAXNOTES; i++) {
+        Note *n = &R->note[i];
+        int row, e;
+        int32_t x0, x1, yc;
+        if (!n->used) continue;
+        row = R->view_top - n->pitch;
+        if (row < 0 || row >= ROWS) continue;
+        e = n->start + (n->len ? n->len : 1);
+        if (e <= win_start || n->start >= win_start + win_ticks) continue;   /* outside the window */
+        { int a = n->start < win_start ? win_start : n->start;
+          int b = e > win_start + win_ticks ? win_start + win_ticks : e;
+          x0 = X0 + (int32_t) ((int64_t) (a - win_start) * GW / win_ticks);
+          x1 = X0 + (int32_t) ((int64_t) (b - win_start) * GW / win_ticks); }
+        yc = Y0 + row * RH + RH / 2;
+        hline(r, x0 + (1 << 9), x1 - (1 << 9), yc, RH - (2 << 10), COL_NOTE);
+    }
+
+    /* time cursor */
+    if (R->cur_t >= win_start && R->cur_t < win_start + win_ticks) {
+        int32_t x = X0 + (int32_t) ((int64_t) (R->cur_t - win_start) * GW / win_ticks);
+        vline(r, x, Y0, gy1, 2 << 9, COL_CUR);
+    }
+    /* playhead */
+    if (R->playing && R->play_t >= win_start && R->play_t < win_start + win_ticks) {
+        int32_t x = X0 + (int32_t) ((int64_t) (R->play_t - win_start) * GW / win_ticks);
+        vline(r, x, Y0, gy1, 3 << 9, COL_HEAD);
+    }
+
+    /* header readouts (op1r vector font: digits, '/', A-G, '#' only) */
+    frac_str(tmp, grid);           fw_text(r, 4 << 10,  12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
+    frac_str(tmp, R->cur_len);     fw_text(r, 70 << 10, 12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
+    num_str(tmp, R->loop_len / grid);
+                                   fw_text(r, 140 << 10, 12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
 }
 
 /* ------------------------------------------------------------------ hooks (each chains to op1r's) */
-
-/* idFromName: own the name "roll" on the arpeggio id; otherwise defer to op1r (which handles euclid). */
 int32_t rp_id_from_name(const te_string *s) {
     int m = (fw_mode == 1);
     if (streq(te_cstr(s), "roll")) {
+        if (!roll[m].inited) roll_defaults(&roll[m]);
         roll_flag[m] = 1;
-        op1r_euclid_flag[m] = 0;                 /* we win this mode; make sure euclid releases it */
+        op1r_euclid_flag[m] = 0;
         return HOST_ID;
     }
     roll_flag[m] = 0;
-    return op1r_id_from_name(s);                 /* sets/clears euclid's own flag */
+    return op1r_id_from_name(s);
 }
-
-/* nameFromId: report "roll" for our id when our flag is set; otherwise defer to op1r. */
 const char *rp_name_from_id(int32_t id) {
     int m = (fw_mode == 1);
-    if (id == HOST_ID && roll_flag[m])
-        return "roll";
+    if (id == HOST_ID && roll_flag[m]) return "roll";
     return op1r_name_from_id(id);
 }
-
-/* the arpeggio singleton getter: return our player when roll is active for this mode. */
 void *rp_arp_instance(void) {
     int m = (fw_mode == 1);
     return roll_flag[m] ? (void*) roll_player : fw_arp_instance();
 }
 
-/* keep the screen registry slot pointing at our screen while roll is active for the current mode */
 static void roll_update_slot(void) {
     if (roll_ready)
         fw_screen_reg[HOST_SCREEN] = roll_flag[fw_mode == 1] ? (void*) roll_scr_obj : roll_stock_arp_scr;
@@ -209,42 +354,99 @@ static int roll_showing(void) {
     return roll_ready && fw_cur_screen == HOST_SCREEN && roll_flag[fw_mode == 1];
 }
 
-/* build our screen after op1r builds its own (runs once at boot) */
 void *rp_build_screens(void) {
     void *ret = op1r_build_screens();
     int i;
+    roll_defaults(&roll[0]);
+    roll_defaults(&roll[1]);
     roll_flag[0] = roll_flag[1] = 0;
-    roll_on_note[0] = roll_on_note[1] = 0;
-    roll_tick_count[0] = roll_tick_count[1] = 0;
-    roll_playstep[0] = roll_playstep[1] = 0;
-
-    roll_stock_arp_scr = fw_screen_reg[HOST_SCREEN];      /* save arpeggio's own screen */
-    fw_screen_ctor(roll_scr_obj, HOST_SCREEN, "roll.svg");/* this overwrites the slot with ours */
-    fw_screen_reg[HOST_SCREEN] = roll_stock_arp_scr;      /* restore it; we swap in on demand */
-
-    for (i = 0; i < 10; i++)                              /* base screen vtable (01911474) + our draw */
-        roll_scr_vt[i] = ((const uint32_t*) 0x01911474)[i];
-    roll_scr_vt[7] = (uint32_t) roll_draw;                /* slot +0x1c = draw */
-    roll_scr_obj[3] = (uint32_t) roll_scr_vt;             /* obj+0xc = vptr */
+    roll_stock_arp_scr = fw_screen_reg[HOST_SCREEN];
+    fw_screen_ctor(roll_scr_obj, HOST_SCREEN, "roll.svg");
+    fw_screen_reg[HOST_SCREEN] = roll_stock_arp_scr;
+    for (i = 0; i < 10; i++) roll_scr_vt[i] = ((const uint32_t*) 0x01911474)[i];
+    roll_scr_vt[7] = (uint32_t) roll_draw;              /* slot +0x1c = draw */
+    roll_scr_obj[3] = (uint32_t) roll_scr_vt;
     return ret;
 }
-
-/* after op1r initialises its screens */
 void rp_init_screens(void) {
     op1r_init_screens();
     roll_ready = 1;
 }
 
+/* encoder-press key codes (blue/green/white/red) while the roll screen is up */
+#define K_LEFT 0x24
+#define K_RIGHT 0x25
+static void roll_press(int enc) {
+    Roll *R = &roll[fw_mode == 1];
+    int i;
+    switch (enc) {
+    case 0:                                             /* blue: cycle grid */
+        R->grid_i = (R->grid_i + 1) & 3;
+        if (R->cur_len < grid_of(R)) R->cur_len = grid_of(R);
+        break;
+    case 2:                                             /* white: cycle velocity */
+        R->vel_i = (R->vel_i + 1) % 3;
+        break;
+    case 3:                                             /* red: clear the cursor column */
+        for (i = 0; i < MAXNOTES; i++) {
+            Note *n = &R->note[i];
+            if (n->used && n->start <= R->cur_t && R->cur_t < n->start + (n->len ? n->len : 1))
+                n->used = 0;
+        }
+        break;
+    default: break;                                     /* green press reserved */
+    }
+}
+
 void rp_key(int32_t key, int32_t pressed) {
-    op1r_key(key, pressed);                               /* euclid shortcuts + stock dispatch */
+    if (roll_showing() && pressed && key >= 0x3b && key <= 0x3e) {
+        roll_press(key - 0x3b);                         /* encoder presses: handle and swallow */
+        return;
+    }
+    op1r_key(key, pressed);
     roll_update_slot();
 }
 
 void rp_encoder(int32_t enc, int16_t *delta) {
-    if (roll_showing())
-        return;                                          /* step 1: swallow (no editing yet) */
-    op1r_encoder(enc, delta);
+    Roll *R;
+    int n;
+    if (!roll_showing()) { op1r_encoder(enc, delta); return; }
+    R = &roll[fw_mode == 1];
+    n = (int) *delta / 1024;                            /* one detent = 0x400 */
+    if (!n) return;
+    switch (enc) {
+    case 0: {                                           /* blue: time cursor */
+        int t = (int) R->cur_t + n * grid_of(R);
+        while (t < 0) t += R->loop_len;
+        R->cur_t = (uint16_t) (t % R->loop_len);
+        break;
+    }
+    case 1: {                                           /* green: scroll pitch view */
+        int v = R->view_top - n;
+        if (v < ROWS - 1) v = ROWS - 1;
+        if (v > 127) v = 127;
+        R->view_top = (int8_t) v;
+        break;
+    }
+    case 2: {                                           /* white: note length */
+        int g = grid_of(R);
+        int l = (int) R->cur_len + n * g;
+        if (l < g) l = g;
+        if (l > R->loop_len) l = R->loop_len;
+        R->cur_len = (uint16_t) l;
+        break;
+    }
+    case 3: {                                           /* red: loop length */
+        int g = grid_of(R);
+        int l = (int) R->loop_len + n * g;
+        if (l < g) l = g;
+        if (l > MAXLOOP) l = MAXLOOP;
+        R->loop_len = (uint16_t) l;
+        if (R->cur_t >= R->loop_len) R->cur_t = 0;
+        break;
+    }
+    default: break;
+    }
 }
 
-/* force objcopy to emit the whole blob (incl. zeroed bss) even if it ends in .bss */
 __attribute__((section(".tail"), used)) const uint32_t rp_tail = 0;
