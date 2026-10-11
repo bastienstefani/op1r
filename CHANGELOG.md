@@ -3,6 +3,19 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 08:35 — op1r 8
+
+Output `794934277973cd8a8ad9a3b2ec3f51149a6e15284dfac34793536f487d4da90a`
+
+### Added
+- quad LFO: **Shift page** with a table of all four LFOs. Blue frequency (Hz) or tempo division, green smoothing
+  (0–7), white waveform (sine, triangle, ramp up, ramp down, square, sample & hold), red tempo sync on/off
+  (4/1, 2/1, 1/1, 1/2, 1/4, 1/4T, 1/8, 1/8T, 1/16, 1/16T, 1/32).
+- Patches saved with earlier versions keep their LFO frequencies (sine, free, no smoothing).
+
+### Changed
+- Boot screen version: `op1r 8`.
+
 ## 2026-10-10 21:18 — op1r 7
 
 Output `ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c`

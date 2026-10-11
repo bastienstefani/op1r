@@ -13,43 +13,43 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "a07703450d197b6dda6d3705f2ec3761fba4e06b5b6f4fd1aa4d246f24dc23ca",
+   "result_sha256": "0f5253b07587d3e721fda09619773338599218f9e211e02296e9141b0fbc4587",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "4c"
+     "new": "50"
     },
     {
      "op": "replace",
      "offset": 12,
      "old": "d82221",
-     "new": "70ba22"
+     "new": "1cca22"
     },
     {
      "op": "replace",
      "offset": 313970,
      "old": "522e203030323436",
-     "new": "20206f7031722037"
+     "new": "20206f7031722038"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "8ccae0"
+     "new": "68d4e0"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "98cae0"
+     "new": "74d4e0"
     },
     {
      "op": "replace",
      "offset": 317408,
      "old": "78c0a3",
-     "new": "c2cae0"
+     "new": "9ed4e0"
     },
     {
      "op": "replace",
@@ -61,19 +61,19 @@
      "op": "replace",
      "offset": 416328,
      "old": "68ce9c",
-     "new": "cecae0"
+     "new": "aad4e0"
     },
     {
      "op": "replace",
      "offset": 416360,
      "old": "48d09c",
-     "new": "1acbe0"
+     "new": "f6d4e0"
     },
     {
      "op": "replace",
      "offset": 416392,
      "old": "04d19c",
-     "new": "f4cae0"
+     "new": "d0d4e0"
     },
     {
      "op": "replace",
@@ -127,19 +127,19 @@
      "op": "replace",
      "offset": 1048526,
      "old": "18300b32",
-     "new": "22e22faf"
+     "new": "22e22daf"
     },
     {
      "op": "replace",
      "offset": 1055476,
      "old": "38080b10",
-     "new": "23e34801"
+     "new": "23e33606"
     },
     {
      "op": "replace",
      "offset": 1056444,
      "old": "01080710",
-     "new": "22e377ff"
+     "new": "23e36504"
     },
     {
      "op": "replace",
@@ -157,19 +157,19 @@
      "op": "replace",
      "offset": 1110328,
      "old": "03e38c71",
-     "new": "22e3f836"
+     "new": "22e3f636"
     },
     {
      "op": "replace",
      "offset": 1146750,
      "old": "ffe39b9f",
-     "new": "21e3b7f2"
+     "new": "21e3b5f2"
     },
     {
      "op": "replace",
      "offset": 1147092,
      "old": "ffe3bc9e",
-     "new": "21e3a4f3"
+     "new": "21e3a2f3"
     },
     {
      "op": "replace",
@@ -193,13 +193,13 @@
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e2d45e"
+     "new": "21e2c263"
     },
     {
      "op": "replace",
      "offset": 1279908,
      "old": "a5e60900",
-     "new": "21e2b84a"
+     "new": "21e2a64f"
     },
     {
      "op": "replace",
@@ -223,7 +223,7 @@
      "op": "replace",
      "offset": 1333822,
      "old": "02e33f59",
-     "new": "20e34f84"
+     "new": "20e34d84"
     },
     {
      "op": "replace",
@@ -241,7 +241,7 @@
      "op": "replace",
      "offset": 1450940,
      "old": "ffe38801",
-     "new": "1fe368bf"
+     "new": "1fe356c4"
     },
     {
      "op": "replace",
@@ -271,7 +271,7 @@
      "op": "replace",
      "offset": 1642440,
      "old": "fbe3d0f2",
-     "new": "1ee33428"
+     "new": "1ee33228"
     },
     {
      "op": "replace",
@@ -307,8 +307,8 @@
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "cf4b70a60dd4bdb0d4f7f440cc9770c796fde8c1fd7279a333ba23249d0befac",
-     "size": 104344
+     "sha256": "4ae12275076773d614a5705cda7d77722139c0a1e6911829298c7bfea7670a49",
+     "size": 108356
     }
    ]
   },
@@ -461,8 +461,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "ee9916d346063786b0f485be95d10789c6cb4fc8266ad04fd347e3c3c5318e9a",
-  "sha256": "ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c",
-  "size": 12814545
+  "tar_sha256": "5b23e7230a96c810b26d6c2b62c3d1bf364d547e911be8e15cd4e94ec23cbc73",
+  "sha256": "794934277973cd8a8ad9a3b2ec3f51149a6e15284dfac34793536f487d4da90a",
+  "size": 12816667
  }
 }

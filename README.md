@@ -23,6 +23,8 @@ with:
   - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
     to the target)
   - press an encoder to select LFO 1–4
+  - hold **Shift** for a table of all four LFOs: blue frequency / tempo division, green smoothing, white waveform
+    (sine, triangle, ramp up/down, square, sample & hold), red sync to the OP-1 tempo (4/1 … 1/32, triplets)
 - **euclid** sequencer, an extra sequencer next to the stock ones (pick it in the sequencer list), for synth and drums
   - 6 sequencer slots, each playing one note; **Shift + white** selects the slot, a note key on the euclid screen
     assigns its note, at the octave of that moment
@@ -89,7 +91,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `794934277973cd8a8ad9a3b2ec3f51149a6e15284dfac34793536f487d4da90a` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
