@@ -1,20 +1,24 @@
-/* Piano-roll sequencer for the OP-1 (R246), built on top of op1r.  STEP 2: editing.
+/* Piano-roll sequencer for the OP-1 (R246), built on top of op1r.
  *
- * Study example for docs/firmware-r246.md.  NOT TESTED ON HARDWARE.  The original op1_246.op1 and the op1r
+ * Study example for docs/firmware-r246.md.  The original op1_246.op1 and the op1r
  * image can always be reflashed, so a lock-up only costs a reflash.
  *
  * New sequencer "roll" hosted on the stock arpeggio (internal id 5, screen id 0x2c), exactly as op1r hosts
  * euclid on finger (id 3, screen 0x2d).  Every hook chains to op1r's so euclid keeps working.
  *
- * Step 1 (done, flash tested): the entry appears and is selectable, a grid screen shows a moving playhead, a
- * demo pattern loops.  Step 2 (this file): a real note model with polyphonic playback and editing:
+ * Step 1 (flash tested): the entry appears and is selectable, a grid screen shows a moving playhead.
+ * Step 2 (flash tested): a real note model with polyphonic playback and editing:
  *   - time cursor (blue), pitch scroll (green), note length (white), loop length (red);
  *   - a keyboard key places a note of that pitch at the cursor with the current length (step input);
  *     Shift + key removes it;
  *   - blue press cycles the grid, green press clears the cursor column, white press the velocity;
- *   - orange press starts / stops playback (HOLD box: faded red when held, red when playing);
+ *   - orange press starts / stops playback, starting on the next beat of the sequencer clock (HOLD box:
+ *     faded red when held, red once started or armed);
  *   - each note keeps its own start and length ("customizable duration"); the loop length is settable.
- * Saving to op1.db comes in step 3; until then the pattern is lost on power off.
+ * Step 3 (flash tested): pattern and settings of each mode are saved to op1.db (table rollseq) in the
+ * background and reloaded at boot.
+ * Beat-aligned start: the stock sequencer-clock reset (01a5e7d0) is replaced by rp_clock_reset, which does the
+ * same stores and flags the reset, so roll_tick knows which half-beat tick 0 is the beat.
  */
 #include <stdint.h>
 
@@ -44,12 +48,13 @@ extern void  fw_bg_register(void *saveable);                           /* 0193f0
 extern void  fw_bg_dirty(void *saveable);                              /* 0193ef3c */
 extern void  fw_free(void *p);                                         /* 01a5e310 (operator delete) */
 
-extern int32_t     op1r_id_from_name(const void *s);   /* 01e007a8 */
-extern const char *op1r_name_from_id(int32_t id);      /* 01e0083c */
-extern void       *op1r_build_screens(void);           /* 01e00c04 */
-extern void        op1r_init_screens(void);            /* 01e00eb4 */
-extern void        op1r_key(int32_t key, int32_t pressed);   /* 01e010f0 */
-extern void        op1r_encoder(int32_t enc, int16_t *delta);/* 01e01384 */
+/* op1r 10 hooks we chain to: addresses in fw.ld, verified against the op1r image by build.sh */
+extern int32_t     op1r_id_from_name(const void *s);
+extern const char *op1r_name_from_id(int32_t id);
+extern void       *op1r_build_screens(void);
+extern void        op1r_init_screens(void);
+extern void        op1r_key(int32_t key, int32_t pressed);
+extern void        op1r_encoder(int32_t enc, int16_t *delta);
 
 #define HOST_ID      5
 #define HOST_SCREEN  0x2c
@@ -123,16 +128,66 @@ static void snd_off_all(Roll *R) {
         }
 }
 
+/* Beat tracking on the stock sequencer clock (96 ticks per quarter).  The player tick receives the global
+ * counter 018c1884, which counts ticks modulo 48 (half a beat); count its wraps to know which half we are in.
+ * When the clock is reset (01a5e7d0: tape PLAY, MIDI Start, a stock sequencer starting) the counter jumps to
+ * 0: a beat starts there.  Any other jump (e.g. after a mode switch) keeps the current guess. */
+static uint8_t clk_last48 = 0xff;               /* 0xff: nothing seen yet */
+static uint8_t clk_half;                        /* 0: first half of the beat, 1: second half */
+volatile uint8_t clk_reset_pending;             /* set by rp_clock_reset (any thread) */
+static int clk_on_beat(int32_t tick48) {
+    unsigned t = (unsigned) tick48 % 48;
+    if (clk_reset_pending) {                    /* the clock was reset: beat 1 starts at its first tick */
+        clk_reset_pending = 0;
+        clk_half = 0;
+    } else if (clk_last48 != 0xff && t == (clk_last48 + 1u) % 48) {
+        if (t == 0) clk_half ^= 1;
+    } else if (t == 0) {
+        clk_half = 0;                           /* jumped to 0 without the hook seeing it: treat as a reset */
+    }
+    clk_last48 = (uint8_t) t;
+    return t == 0 && clk_half == 0;
+}
+
+/* Replacement for the stock sequencer-clock reset 01a5e7d0 (10 callers: tape PLAY, MIDI Start, stock
+ * sequencers starting).  Same three stores as the original, plus a flag so a reset that happens exactly when
+ * the counter would wrap 47 -> 0 by itself is not missed.  Written in assembly to use only P1 and R0, the
+ * registers the original clobbers, so its callers see no difference. */
+__asm__(
+"    .text\n"
+"    .align 4\n"
+"    .global _rp_clock_reset\n"
+"    .type _rp_clock_reset, STT_FUNC\n"
+"_rp_clock_reset:\n"
+"    P1.L = 0x187c;\n"
+"    P1.H = 0x018c;\n"
+"    R0 = 0 (X);\n"
+"    [P1] = R0;\n"
+"    [P1 + 4] = R0;\n"
+"    [P1 + 8] = R0;\n"
+"    P1.H = _clk_reset_pending;\n"
+"    P1.L = _clk_reset_pending;\n"
+"    R0 = 1 (X);\n"
+"    B [P1] = R0;\n"
+"    rts;\n"
+"    .size _rp_clock_reset, .-_rp_clock_reset\n"
+);
+
 static void roll_tick(void *self, int32_t tick48) {
     Roll *R = &roll[fw_mode == 1];
     uint16_t t;
-    int i;
-    (void) self; (void) tick48;
-    if (!R->run) {                                  /* HOLD: release once, then wait for the orange press */
+    int i, beat;
+    (void) self;
+    beat = clk_on_beat(tick48);                 /* track every tick, even on HOLD */
+    if (!R->run) {                              /* HOLD: release once, then wait for the orange press */
         if (R->playing) { snd_off_all(R); R->play_t = 0; R->playing = 0; }
         return;
     }
-    if (!R->playing) { R->play_t = 0; R->playing = 1; }     /* start from the top of the loop */
+    if (!R->playing) {                          /* armed: start from the top of the loop on the next beat */
+        if (!beat) return;
+        R->play_t = 0;
+        R->playing = 1;
+    }
     t = R->play_t;
 
     for (i = 0; i < POLY; i++)                      /* note-off at gate end */

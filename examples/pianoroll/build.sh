@@ -28,6 +28,9 @@ check 0x019f07d2 0x01e0106c     # init screens
 check 0x019c2d3e 0x01e012a8     # key
 check 0x019c2e94 0x01e017e0     # encoder
 check 0x01a0d1b0 0x01a46400     # arp instance (op1r leaves it on the stock getter)
+# the stock sequencer-clock reset we replace must be untouched (same bytes as R246)
+CLK=$(python3 -c "import sys; sys.path.insert(0,'$ROOT/tools'); import fwtool as T; d=open('$LDR','rb').read(); o=T.addr2off(list(T.ldr_blocks(d)),0x01a5e7d0); print(d[o:o+18].hex())")
+[ "$CLK" = "09e17c1849e18c010060089348b088b01000" ] || { echo "01a5e7d0 is not the stock clock reset ($CLK)"; exit 1; }
 
 # guard: the stock-address section of fw.ld must not point into op1r's block (it moves with each op1r version)
 bad=$(awk '/R246 firmware entry points/{f=1} /hook targets we chain to/{f=0} f && /= 0x01e/' "$HERE/fw.ld")
@@ -54,6 +57,7 @@ python3 "$ROOT/tools/fwbuild.py" "$FW" --op1r -o "$OUT" \
     --call 0x019f07d2=$(sym rp_init_screens) \
     --call 0x019c2d3e=$(sym rp_key) \
     --call 0x019c2e94=$(sym rp_encoder) \
+    --jump 0x01a5e7d0=$(sym rp_clock_reset) \
     --file "content/display/roll.svg=$HERE/roll.svg" \
     --sql "content/op1_factory.db=INSERT INTO seq_types (id, type) VALUES (8, 'roll')" \
     --text "0x018f738a=op1rroll"
