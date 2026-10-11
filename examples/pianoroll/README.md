@@ -8,14 +8,17 @@ Greffé sur l'arpeggio d'origine (id interne 5, écran 0x2c), exactement comme o
 Chaque hook s'enchaîne derrière celui d'op1r, donc euclid continue de fonctionner. Il n'y a pas de collision
 entre « roll » et euclid (id, drapeau, écran et table distincts).
 
+**Construit sur op1r 10.** Les adresses des hooks d'op1r sont re-dérivées de l'image op1r 10 (le bloc de code
+d'op1r change à chaque version) ; `build.sh` les vérifie et refuse de construire si elles ne correspondent plus.
+
 ## Étapes
 
 - Étape 1 (fait, testée sur matériel) : « roll » dans la liste, écran avec grille et tête de lecture, motif de
   démo en boucle.
-- **Étape 2 (ici)** : vrai modèle de notes avec lecture **polyphonique** et **édition**. Chaque note garde sa
-  propre position et sa propre durée ; la longueur de boucle est réglable. **Pas encore** : la sauvegarde (le
-  motif est perdu à l'extinction).
-- Étape 3 : sauvegarde par mode dans `op1.db`, comme euclid.
+- Étape 2 (fait, testée sur matériel) : modèle de notes, lecture **polyphonique**, **édition** (chaque note a sa
+  position et sa durée ; longueur de boucle réglable).
+- **Étape 3 (ici)** : **sauvegarde**. Le motif, les réglages et la longueur de boucle de chaque mode sont écrits
+  dans la table `rollseq` d'`op1.db`, en tâche de fond (comme euclid), et rechargés au démarrage.
 
 ## Commandes (étape 2)
 
@@ -49,19 +52,17 @@ en nombre de pas.
 3. Lancer le séquenceur : le motif de démo tourne en boucle. L'écran montre la grille et la tête de lecture.
    Fonctionne en mode synth comme en mode drum (motif différent).
 
-## À regarder pour tes retours (étape 2)
+## À regarder pour tes retours (étape 3)
 
-- Poser des notes au clavier : apparaissent-elles au bon endroit, à la bonne hauteur, avec la bonne durée ?
-- Le curseur (bleu), la grille (appui bleu), la durée (blanc), la longueur de boucle (rouge) répondent-ils comme
-  attendu ? Le défilement des hauteurs (vert) ?
-- La lecture est-elle bien polyphonique (plusieurs notes en même temps) et au bon tempo ? Pas de note bloquée en
-  bouclant, en coupant, ou en changeant de séquenceur ?
-- Shift + touche efface-t-il la bonne note ? L'appui rouge efface-t-il la colonne du curseur ?
-- L'en-tête (grille / durée / longueur) est-il lisible et juste ?
-- Euclid et les séquenceurs d'origine marchent-ils toujours ?
+- **Sauvegarde** : pose quelques notes, règle la boucle, éteins puis rallume l'OP-1 → le motif revient-il, en
+  synth et en drum ? (Laisse quelques secondes après la dernière édition avant d'éteindre : la sauvegarde se fait
+  en tâche de fond.)
+- Tout ce qui marchait à l'étape 2 (édition, lecture polyphonique, encodeurs, pas de note bloquée) tient-il
+  toujours ?
+- Euclid et les séquenceurs d'origine marchent-ils toujours (y compris leur propre sauvegarde) ?
+- Rien d'anormal au démarrage (c'est là que le motif est rechargé depuis la base) ?
 
-Limites connues de l'étape 2 : pas encore de sauvegarde (motif perdu à l'extinction) ; changer l'octave pendant
-la lecture peut laisser une note bloquée (comme l'euclid d'op1r).
+Limite connue : changer l'octave pendant la lecture peut laisser une note bloquée (comme l'euclid d'op1r).
 
 ## Fichiers
 

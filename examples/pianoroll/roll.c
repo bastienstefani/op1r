@@ -20,11 +20,12 @@
 /* ---- firmware (R246) addresses; see fw.ld.  bfin-elf adds a leading underscore to C symbols. ---- */
 typedef struct { int32_t x, y; } Pt;                 /* screen coords, 22.10 fixed point (1 px = 1<<10) */
 typedef struct { int32_t note, vel; uint8_t midi, pad[3]; int32_t user; } MidiNote;  /* 16 bytes */
+/* a std::string: inline buffer at +4 when capacity (+0x18) < 16, else a pointer; length at +0x14 */
+typedef struct { uint32_t a; union { char buf[16]; char *ptr; } u; uint32_t len, cap; } te_string;
 
 extern volatile int32_t  fw_mode;                    /* 01de4c40: 0 = synth, 1 = drum */
 extern volatile int32_t  fw_cur_screen;              /* 018b65c8: id of the screen being shown */
 extern void             *fw_screen_reg[];            /* 01df4e54: screen registry, indexed by screen id */
-extern volatile uint8_t  op1r_euclid_flag[];         /* 01e158d0: op1r's euclid-active flag [synth, drum] */
 extern volatile int32_t  fw_synth_slot;              /* ff8016d4: current synth sound slot */
 extern volatile int8_t   fw_synth_oct[];             /* 01dfe4e0: per-slot synth octave, -4..+4 */
 
@@ -37,6 +38,13 @@ extern void  fw_note_on(const MidiNote *, int32_t drum_semi);          /* 01a857
 extern void  fw_note_off(const MidiNote *);                            /* 01a85840 */
 extern void *fw_arp_instance(void);                                    /* 01a46400 (stock arp singleton) */
 
+extern void *fw_db_op1(void);                                          /* 0196dd44: op1.db handle */
+extern void  fw_db_exec(void *db, const char *sql);                    /* 0196f950 */
+extern void  fw_db_get_string(te_string *out, void *db, const char *sql); /* 0196fbd0 */
+extern void  fw_bg_register(void *saveable);                           /* 0193f010 */
+extern void  fw_bg_dirty(void *saveable);                              /* 0193ef3c */
+extern void  fw_free(void *p);                                         /* 01a5e310 (operator delete) */
+
 extern int32_t     op1r_id_from_name(const void *s);   /* 01e007a8 */
 extern const char *op1r_name_from_id(int32_t id);      /* 01e0083c */
 extern void       *op1r_build_screens(void);           /* 01e00c04 */
@@ -47,7 +55,6 @@ extern void        op1r_encoder(int32_t enc, int16_t *delta);/* 01e01384 */
 #define HOST_ID      5
 #define HOST_SCREEN  0x2c
 
-typedef struct { uint32_t a; union { char buf[16]; char *ptr; } u; uint32_t len, cap; } te_string;
 static const char *te_cstr(const te_string *s) { return s->cap < 16 ? s->u.buf : s->u.ptr; }
 static int streq(const char *a, const char *b) { while (*a && *a == *b) { a++; b++; } return *a == *b; }
 
@@ -87,6 +94,7 @@ static uint32_t roll_scr_obj[4];
 static uint32_t roll_scr_vt[10];
 
 static uint16_t grid_of(Roll *R) { return GRIDS[R->grid_i & 3]; }
+static void roll_dirty(void);                           /* mark the pattern for background saving */
 
 static void roll_defaults(Roll *R) {
     int i;
@@ -197,12 +205,13 @@ static int32_t roll_key_down(void *self, int32_t key, int32_t shift) {
     if (pitch < 0 || pitch > 127) return shift ? 1 : 0;
     if (shift) {
         int i = note_at(R, pitch, R->cur_t);
-        if (i >= 0) R->note[i].used = 0;
+        if (i >= 0) { R->note[i].used = 0; roll_dirty(); }
         return 1;                                       /* swallow: no live sound on delete */
     }
     place_note(R, pitch, R->cur_t, R->cur_len, VELS[R->vel_i % 3]);
     R->view_top = (int8_t) (pitch + 2 > 127 ? 127 : pitch + 2);     /* keep the note in view */
     R->cur_t = (uint16_t) ((R->cur_t + R->cur_len) % R->loop_len);  /* step input: advance */
+    roll_dirty();
     return 0;                                           /* also sound it live as feedback */
 }
 
@@ -324,17 +333,117 @@ static void roll_draw(void *self, int32_t dt) {
                                    fw_text(r, 140 << 10, 12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
 }
 
+/* ------------------------------------------------------------------ persistence (op1.db table "rollseq") */
+/* Same mechanism as op1r's euclid: a bg_saver object the FileWorker thread calls when marked dirty, and one
+ * TEXT row per mode.  The payload is plain decimals separated by commas (no '%' or quote, which db2's double
+ * vsnprintf would choke on).  Addresses are stock R246 (unchanged by op1r). */
+static struct { uint8_t dirty, pending, pad[2]; const void *vptr; } roll_saver;
+static char sqlbuf[8192];
+
+static char *put_uint(char *p, unsigned v) {
+    char t[10]; int i = 0;
+    if (!v) { *p++ = '0'; return p; }
+    while (v && i < 10) { t[i++] = '0' + v % 10; v /= 10; }
+    while (i) *p++ = t[--i];
+    return p;
+}
+static char *put_str(char *p, const char *s) { while (*s) *p++ = *s++; return p; }
+
+static int rd_uint(const char **pp, unsigned *out) {
+    const char *p = *pp; unsigned v = 0;
+    while (*p && (*p < '0' || *p > '9')) p++;
+    if (!*p) return 0;
+    while (*p >= '0' && *p <= '9') v = v * 10 + (unsigned) (*p++ - '0');
+    *pp = p; *out = v; return 1;
+}
+
+static void roll_save(void *obj) {
+    void *db = fw_db_op1();
+    int m, i;
+    (void) obj;
+    if (!db) return;
+    for (m = 0; m < 2; m++) {
+        Roll *R = &roll[m];
+        char *p = sqlbuf;
+        p = put_str(p, "INSERT OR REPLACE INTO rollseq VALUES (");
+        p = put_uint(p, m);
+        p = put_str(p, ",'");
+        p = put_uint(p, R->loop_len); *p++ = ',';
+        p = put_uint(p, R->grid_i);   *p++ = ',';
+        p = put_uint(p, R->vel_i);    *p++ = ',';
+        p = put_uint(p, (uint8_t) R->view_top); *p++ = ',';
+        p = put_uint(p, R->cur_len);
+        for (i = 0; i < MAXNOTES; i++) {
+            Note *n = &R->note[i];
+            if (!n->used) continue;
+            if (p > sqlbuf + sizeof(sqlbuf) - 32) break;    /* keep well under db2's 8 KB limit */
+            *p++ = ','; p = put_uint(p, n->start);
+            *p++ = ','; p = put_uint(p, n->len);
+            *p++ = ','; p = put_uint(p, n->pitch);
+            *p++ = ','; p = put_uint(p, n->vel);
+        }
+        p = put_str(p, "')");
+        *p = 0;
+        fw_db_exec(db, sqlbuf);
+    }
+}
+
+static void roll_load(void *db, int m) {
+    te_string buf;
+    const char *s;
+    unsigned v;
+    Roll *R = &roll[m];
+    int g, i;
+    char *p = sqlbuf;
+    buf.cap = 0; buf.len = 0; buf.u.buf[0] = 0;             /* so te_cstr() is safe if nothing is written */
+    p = put_str(p, "SELECT data FROM rollseq WHERE is_synth=");
+    p = put_uint(p, m); *p = 0;
+    fw_db_get_string(&buf, db, sqlbuf);
+    s = te_cstr(&buf);
+    if (rd_uint(&s, &v)) {                                  /* a row exists: rebuild the model */
+        R->loop_len = v;                                    /* clamped below, once grid is known */
+        if (rd_uint(&s, &v)) R->grid_i = v & 3;
+        if (rd_uint(&s, &v)) R->vel_i = v % 3;
+        if (rd_uint(&s, &v)) R->view_top = (int8_t) (v > 127 ? 127 : (v < ROWS - 1 ? ROWS - 1 : v));
+        if (rd_uint(&s, &v)) R->cur_len = v;
+        g = grid_of(R);
+        if (R->loop_len < g) R->loop_len = g;
+        if (R->loop_len > MAXLOOP) R->loop_len = MAXLOOP;
+        if (R->cur_len < g) R->cur_len = g;
+        if (R->cur_len > R->loop_len) R->cur_len = R->loop_len;
+        for (i = 0; i < MAXNOTES; i++) R->note[i].used = 0;
+        i = 0;
+        while (i < MAXNOTES) {
+            unsigned st, ln, pi, ve;
+            if (!rd_uint(&s, &st) || !rd_uint(&s, &ln) || !rd_uint(&s, &pi) || !rd_uint(&s, &ve)) break;
+            if (st >= MAXLOOP || pi > 127) continue;
+            R->note[i].start = (uint16_t) st;
+            R->note[i].len = (uint16_t) (ln ? ln : 1);
+            R->note[i].pitch = (uint8_t) pi;
+            R->note[i].vel = (uint8_t) (ve ? ve : 100);
+            R->note[i].used = 1;
+            i++;
+        }
+    }
+    if (buf.cap >= 16) fw_free(buf.u.ptr);
+}
+
+static void roll_dirty(void) {
+    if (roll_ready) fw_bg_dirty(&roll_saver);
+}
+static const void *roll_saver_vt[6] = { 0, 0, 0, (void*) roll_nop, 0, (void*) roll_save };
+
 /* ------------------------------------------------------------------ hooks (each chains to op1r's) */
 int32_t rp_id_from_name(const te_string *s) {
     int m = (fw_mode == 1);
     if (streq(te_cstr(s), "roll")) {
         if (!roll[m].inited) roll_defaults(&roll[m]);
+        op1r_id_from_name(s);       /* side effect: clears op1r's euclid flag for this mode ("roll" != "euclid") */
         roll_flag[m] = 1;
-        op1r_euclid_flag[m] = 0;
         return HOST_ID;
     }
     roll_flag[m] = 0;
-    return op1r_id_from_name(s);
+    return op1r_id_from_name(s);     /* sets/clears euclid's own flag and returns its id */
 }
 const char *rp_name_from_id(int32_t id) {
     int m = (fw_mode == 1);
@@ -366,6 +475,17 @@ void *rp_build_screens(void) {
     for (i = 0; i < 10; i++) roll_scr_vt[i] = ((const uint32_t*) 0x01911474)[i];
     roll_scr_vt[7] = (uint32_t) roll_draw;              /* slot +0x1c = draw */
     roll_scr_obj[3] = (uint32_t) roll_scr_vt;
+
+    {                                                   /* persistence: register the saver, load saved rows */
+        void *db = fw_db_op1();
+        fw_bg_register(&roll_saver);
+        roll_saver.vptr = roll_saver_vt;
+        if (db) {
+            fw_db_exec(db, "CREATE TABLE IF NOT EXISTS rollseq (is_synth INTEGER PRIMARY KEY, data TEXT NOT NULL)");
+            roll_load(db, 0);
+            roll_load(db, 1);
+        }
+    }
     return ret;
 }
 void rp_init_screens(void) {
@@ -396,6 +516,7 @@ static void roll_press(int enc) {
         break;
     default: break;                                     /* green press reserved */
     }
+    roll_dirty();
 }
 
 void rp_key(int32_t key, int32_t pressed) {
@@ -434,6 +555,7 @@ void rp_encoder(int32_t enc, int16_t *delta) {
         if (l < g) l = g;
         if (l > R->loop_len) l = R->loop_len;
         R->cur_len = (uint16_t) l;
+        roll_dirty();
         break;
     }
     case 3: {                                           /* red: loop length */
@@ -443,6 +565,7 @@ void rp_encoder(int32_t enc, int16_t *delta) {
         if (l > MAXLOOP) l = MAXLOOP;
         R->loop_len = (uint16_t) l;
         if (R->cur_t >= R->loop_len) R->cur_t = 0;
+        roll_dirty();
         break;
     }
     default: break;

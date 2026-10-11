@@ -21,12 +21,12 @@ LDR=$B/op1r/OP1_vdk.ldr
 
 # verify every op1r hook target we chain to is where fw.ld expects it
 check() { got=$($FWT branch "$LDR" "$1" -q); [ "$got" = "$2" ] || { echo "op1r target at $1 is $got, expected $2 - op1r version mismatch"; exit 1; }; }
-check 0x01a42a2e 0x01e007a8     # idFromName  -> op1r
-check 0x01a422ec 0x01e0083c     # nameFromId  -> op1r
-check 0x01a3bd58 0x01e00c04     # build screens
-check 0x019f07d2 0x01e00eb4     # init screens
-check 0x019c2d3e 0x01e010f0     # key
-check 0x019c2e94 0x01e01384     # encoder
+check 0x01a42a2e 0x01e00964     # idFromName  -> op1r
+check 0x01a422ec 0x01e009f8     # nameFromId  -> op1r
+check 0x01a3bd58 0x01e00dbc     # build screens
+check 0x019f07d2 0x01e0106c     # init screens
+check 0x019c2d3e 0x01e012a8     # key
+check 0x019c2e94 0x01e017e0     # encoder
 check 0x01a0d1b0 0x01a46400     # arp instance (op1r leaves it on the stock getter)
 
 # compile and link at LOAD
