@@ -22,7 +22,8 @@ with:
   - **clouds**: granular texture FX, a port of Mutable Instruments Clouds (position, size, pitch, density;
     encoder presses switch to a second page, red press freezes)
   - **reverb**: lush plate/hall reverb, a port of the Mutable Instruments Elements reverb (time, mix, diffusion,
-    tone); generic FX screen
+    tone); its own screen (Kali: graphics by DAN76): blue shows 1–6 arms, green lights the mix scale, white brightens the skulls,
+    red fades in the fire
 - **quad** LFO: four LFOs in one slot, one row each: live output, frequency, amount, target and type
   - blue frequency (0.05–20 Hz) or tempo division, green amount (±100 %), white target (synth / drum engine knob,
     envelope A D S R or FX knob, shown as a symbol plus a dot in the knob colour), red type
@@ -85,6 +86,7 @@ Rendered on the PC from the same screen code that runs on the OP-1 (host harness
 | Effects | |
 |---|---|
 | ![tape](docs/images/fx_tape.png) **tape** echo | ![clouds](docs/images/fx_clouds.png) **clouds** |
+| ![reverb](docs/images/fx_reverb.png) **reverb** | |
 
 | LFO | Sequencer |
 |---|---|
@@ -118,7 +120,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `a0b657bc2a8df53c3ee1513538f23774ed83e59809a65ee987e639b660525dbc` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `297cac31ab66780fcb5f9e30c3772247b5cdba100d1b7da8b6d8831845eeb1a1` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

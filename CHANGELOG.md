@@ -3,6 +3,18 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 22:45 — op1r 14
+
+Output `297cac31ab66780fcb5f9e30c3772247b5cdba100d1b7da8b6d8831845eeb1a1`
+
+### Added
+- reverb: **own screen** with the Kali artwork instead of the generic FX screen. Blue (time) shows 1–6 arms,
+  green (mix) lights the mix scale from the bottom, white (diffusion) brightens the skull necklace, red (tone) fades
+  in the fire ring and flames; the TIME / DIFFUSION / TONE needles follow their knobs.
+
+### Changed
+- Boot screen version: `op1r 14`.
+
 ## 2026-10-11 22:01 — op1r 13
 
 Output `a0b657bc2a8df53c3ee1513538f23774ed83e59809a65ee987e639b660525dbc`
