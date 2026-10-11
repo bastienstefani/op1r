@@ -3,6 +3,17 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 — examples (patch output unchanged)
+
+Output `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758` (same as op1r 10)
+
+### Added
+- `examples/pianoroll`: rebuilt on op1r 10; saving; orange press = play / hold with a HOLD box; playback starts on
+  the next beat of the sequencer clock.
+- `examples/drive`: a Serum-style distortion FX ("drive") on top of op1r 10 and the piano roll, one image with
+  both. 13 shaper modes, drive, pre/post state-variable filter (LP/BP/HP, resonance), mix, output level; screen
+  with the transfer curve, the signal level on it, in/out waves and the four encoders. Not flash-tested.
+
 ## 2026-10-11 11:28 — op1r 10
 
 Output `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758`

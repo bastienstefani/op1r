@@ -126,6 +126,10 @@ Tools (Python 3 standard library):
   byte for byte.
 - [`examples/midi-panic`](examples/midi-panic) is a small C hook built with `bfin-elf-gcc`: Shift + key sends
   MIDI All Notes Off. It is not flash-tested.
+- [`examples/pianoroll`](examples/pianoroll) adds a piano-roll sequencer ("roll") on top of op1r: note editing,
+  polyphonic playback, saving, beat-aligned start. Flash-tested.
+- [`examples/drive`](examples/drive) adds a Serum-style distortion FX ("drive") on top of op1r and the piano roll:
+  13 shaper modes, pre/post filter, mix, level, with a transfer-curve screen. Not flash-tested yet.
 
 ## Maintainers: rebuilding the patch data
 
