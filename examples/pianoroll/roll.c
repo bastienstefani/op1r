@@ -31,8 +31,6 @@ extern volatile int8_t   fw_synth_oct[];             /* 01dfe4e0: per-slot synth
 
 extern void *fw_scr_raster(void);                                      /* 01a3b490 */
 extern void  fw_line(void *raster, const Pt *a, const Pt *b, int32_t width, const uint8_t rgba[4]); /* 01a24a4c */
-extern void  fw_text(void *raster, int32_t x, int32_t y, int32_t scale,
-                     const char *s, int32_t width, const uint8_t rgba[4]);              /* 01e026f0 (op1r font) */
 extern void  fw_screen_ctor(void *obj, int32_t id, const char *svg);   /* 01a3bab0 */
 extern void  fw_note_on(const MidiNote *, int32_t drum_semi);          /* 01a85750 */
 extern void  fw_note_off(const MidiNote *);                            /* 01a85840 */
@@ -252,25 +250,49 @@ static void vline(void *r, int32_t xc, int32_t y0, int32_t y1, int32_t th, const
     Pt a = { xc, y0 }, b = { xc, y1 }; fw_line(r, &a, &b, th, c);
 }
 
-/* note value text like "1/16" into a 5-char buffer */
-static void frac_str(char *out, uint16_t ticks) {
-    int d = ticks ? (PPQ * 4) / ticks : 0;              /* 96->4, 48->8, 24->16, 12->32 */
-    out[0] = '1'; out[1] = '/';
-    if (d >= 10) { out[2] = '0' + d / 10; out[3] = '0' + d % 10; out[4] = 0; }
-    else         { out[2] = '0' + d; out[3] = 0; }
-}
-static void num_str(char *out, int v) {                 /* up to 3 digits */
+static void num_str(char *out, unsigned v) {            /* up to 3 digits */
     int i = 0; char t[4];
-    if (v <= 0) { out[0] = '0'; out[1] = 0; return; }
+    if (!v) { out[0] = '0'; out[1] = 0; return; }
     while (v && i < 3) { t[i++] = '0' + v % 10; v /= 10; }
     { int j = 0; while (i) out[j++] = t[--i]; out[j] = 0; }
+}
+/* a duration in ticks as a reduced fraction of a whole note: 24 -> "1/16", 72 -> "3/16", 768 -> "2/1" */
+static void frac_str(char *out, unsigned ticks) {
+    unsigned d = PPQ * 4, a = ticks, b = d, t;
+    while (b) { t = a % b; a = b; b = t; }              /* a = gcd(ticks, 384) */
+    if (!a) { out[0] = '0'; out[1] = 0; return; }
+    num_str(out, ticks / a);
+    while (*out) out++;
+    *out++ = '/';
+    num_str(out, d / a);
+}
+
+/* Own 7-segment digits and '/', drawn with the stock fw_line only (no op1r-internal font: op1r's code block,
+ * and every function inside it, moves with each op1r version). x, y = top-left in px. */
+static const uint8_t SEG7[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };  /* a..g = bit 0..6 */
+static void seg_text(void *r, int x, int y, const char *s, const uint8_t c[4]) {
+    const int32_t w = 5 << 10, h = 8 << 10, m = 4 << 10, th = 5 << 8;     /* 5x8 px glyphs, 1.25 px strokes */
+    for (; *s; s++, x += 7) {
+        int32_t X = x << 10, Y = y << 10;
+        unsigned b;
+        if (*s == '/') { Pt p0 = { X, Y + h }, p1 = { X + w, Y }; fw_line(r, &p0, &p1, th, c); continue; }
+        if (*s < '0' || *s > '9') continue;
+        b = SEG7[*s - '0'];
+        if (b & 0x01) hline(r, X, X + w, Y, th, c);
+        if (b & 0x02) vline(r, X + w, Y, Y + m, th, c);
+        if (b & 0x04) vline(r, X + w, Y + m, Y + h, th, c);
+        if (b & 0x08) hline(r, X, X + w, Y + h, th, c);
+        if (b & 0x10) vline(r, X, Y + m, Y + h, th, c);
+        if (b & 0x20) vline(r, X, Y, Y + m, th, c);
+        if (b & 0x40) hline(r, X, X + w, Y + m, th, c);
+    }
 }
 
 static void roll_draw(void *self, int32_t dt) {
     Roll *R;
     void *r;
     int m, i, s, win_ticks, win_start, grid, gy1;
-    char tmp[6];
+    char tmp[12];
     (void) self; (void) dt;
     if (!roll_ready) return;
     r = fw_scr_raster();
@@ -326,11 +348,10 @@ static void roll_draw(void *self, int32_t dt) {
         vline(r, x, Y0, gy1, 3 << 9, COL_HEAD);
     }
 
-    /* header readouts (op1r vector font: digits, '/', A-G, '#' only) */
-    frac_str(tmp, grid);           fw_text(r, 4 << 10,  12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
-    frac_str(tmp, R->cur_len);     fw_text(r, 70 << 10, 12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
-    num_str(tmp, R->loop_len / grid);
-                                   fw_text(r, 140 << 10, 12 << 10, 7 << 7, tmp, 1 << 9, COL_TEXT);
+    /* header readouts: grid, length of new notes (fractions of a whole note), loop length in grid steps */
+    frac_str(tmp, grid);              seg_text(r, 4,   5, tmp, COL_TEXT);
+    frac_str(tmp, R->cur_len);        seg_text(r, 70,  5, tmp, COL_TEXT);
+    num_str(tmp, R->loop_len / grid); seg_text(r, 140, 5, tmp, COL_TEXT);
 }
 
 /* ------------------------------------------------------------------ persistence (op1.db table "rollseq") */

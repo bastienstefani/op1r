@@ -29,6 +29,10 @@ check 0x019c2d3e 0x01e012a8     # key
 check 0x019c2e94 0x01e017e0     # encoder
 check 0x01a0d1b0 0x01a46400     # arp instance (op1r leaves it on the stock getter)
 
+# guard: the stock-address section of fw.ld must not point into op1r's block (it moves with each op1r version)
+bad=$(awk '/R246 firmware entry points/{f=1} /hook targets we chain to/{f=0} f && /= 0x01e/' "$HERE/fw.ld")
+[ -z "$bad" ] || { echo "fw.ld: op1r-internal address in the stock section (unverified, moves between op1r versions):"; echo "$bad"; exit 1; }
+
 # compile and link at LOAD
 "${X}gcc" -O2 -ffreestanding -fno-builtin -nostdlib -ffunction-sections -fdata-sections -Wall -Wextra \
     -c "$HERE/roll.c" -o "$B/roll.o"

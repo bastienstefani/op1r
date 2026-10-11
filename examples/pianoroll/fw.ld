@@ -16,7 +16,9 @@ SECTIONS
     /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.BFIN.*) }
 }
 
-/* R246 firmware entry points (C symbols get a leading underscore on bfin-elf) */
+/* R246 firmware entry points (C symbols get a leading underscore on bfin-elf).  STOCK addresses only: nothing
+ * inside op1r's block (01e00000-01efffff) may go here - op1r's code moves with every op1r version (build.sh
+ * refuses it).  op1r addresses belong in the verified list below. */
 _fw_mode          = 0x01de4c40;
 _fw_cur_screen    = 0x018b65c8;
 _fw_screen_reg    = 0x01df4e54;
@@ -28,7 +30,6 @@ _fw_note_off      = 0x01a85840;
 _fw_arp_instance  = 0x01a46400;
 _fw_synth_slot    = 0xff8016d4;
 _fw_synth_oct     = 0x01dfe4e0;
-_fw_text          = 0x01e026f0;
 _fw_db_op1        = 0x0196dd44;
 _fw_db_exec       = 0x0196f950;
 _fw_db_get_string = 0x0196fbd0;
