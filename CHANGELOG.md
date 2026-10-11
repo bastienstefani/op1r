@@ -3,6 +3,25 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 17:35 — op1r 12
+
+Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c`
+
+### Added
+- dots: **trigger parameters**, edited with white while recording (press white to switch between value and
+  parameter): gate 5–100 % or tie, ratchet 1–8, chance 0–100 %, condition (ALL, 1:2 … 4:4), nudge ±12/96 beat,
+  ratchet level ramp (off / up / down). New triggers start with defaults; recording over a trigger only changes
+  its note.
+- dots: **live recording**. The OP-1 REC key switches recording on / off on the dots screen (it no longer arms the
+  tape there); pressing red switches the type between REC (step record) and LIVE. LIVE records keys at the playhead
+  of the running slot, hard quantised, with the gate from the key hold time (longer than a step = tie); while the
+  slot is stopped it records at the cursor.
+
+### Changed
+- dots: record mode is no longer toggled by pressing red (REC key instead); `REC` / `LIVE` moved to the top right.
+- dots: saved data now includes the trigger parameters; patterns saved with op1r 11 still load.
+- Boot screen version: `op1r 12`.
+
 ## 2026-10-11 15:29 — op1r 11
 
 Output `b43716c5df59c5eeedfa4b6687bbd2a05945f46fc89955bec91e2bd65ca716f3`
