@@ -3,7 +3,9 @@
 Turns the original Teenage Engineering OP-1 firmware **R246** (`op1_246.op1`) into a custom firmware
 with:
 
-- custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**
+- custom synth engines with their own screens: **supersaw** (chainsaw), **fmbell** (bell), **granular**; they follow note velocity
+  - **granular** plays the slot's sample: press **input** on a granular slot for "keyboard to sample" and record
+    straight into it (the slot stays granular); **red press** = page 2, sample gain (0–4×)
 - animated **lab screen for the stock iter synth**: gauges follow the knobs; bubbles, flame, falling dashes, voice
   dots and a note display react to the knobs and to what you play (graphic: `iter-lab.svg` from
   [op1repacker](https://github.com/op1hacks/op1repacker), MIT License, © 2016 op1hacks)
@@ -21,11 +23,15 @@ with:
   - each LFO runs **per voice** (locked to the notes, like the stock LFOs) or **free-running** (white dot next
     to the target)
   - press an encoder to select LFO 1–4
+  - hold **Shift** for a table of all four LFOs: blue frequency / tempo division, green smoothing, white waveform
+    (sine, triangle, ramp up/down, square, sample & hold), red sync to the OP-1 tempo (4/1 … 1/32, triplets)
 - **euclid** sequencer, an extra sequencer next to the stock ones (pick it in the sequencer list), for synth and drums
   - 6 sequencer slots, each playing one note; **Shift + white** selects the slot, a note key on the euclid screen
     assigns its note, at the octave of that moment
-  - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press blue/green/white for
-    page 2: rate (1/4 … 1/32, triplets), gate, octave
+  - blue steps, green pulses, white rotation, red start/stop (**Shift + red**: all slots); press an encoder for
+    page 2: rate (1/4 … 1/32, triplets), gate, octave, **level** (note velocity, per slot)
+  - the level is always shown as a red bar at the right border (triangle next to the dot while red is on page 2);
+    a playing slot shows a red dot in the centre of its ring
   - **Shift + G A B C D E** (the last six white keys) mutes/unmutes slots 1–6, **Shift + D#** mutes/unmutes all;
     a muted slot keeps running (dimmed dots) but plays nothing; works from any screen
   - **Shift + C#** starts all slots at once, or stops them if any is running; works from any screen. Hold **REC**
@@ -33,8 +39,17 @@ with:
   - **4 patterns** per synth/drum: **Shift + F G A B** (the first four white keys) switches to pattern 1–4
     immediately, from any screen (also the tape view). A pattern holds the notes and settings of all slots incl. mutes;
     which slots are playing stays the same across patterns. The pattern number (P1–P4) is shown bottom left
+  - on the euclid screen **lift / drop / scissors** copy / paste / cut the selected slot; with **Shift** the whole
+    pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
+- **MIDI CC control** (USB MIDI, on the OP-1's MIDI channel):
+  - keys: CC = key code + 5 as in the OP-1's own CTRL mode, value ≥ 64 press / < 64 release: 5 help, 6 metronome,
+    7–10 synth/drum/tape/mixer, 11–14 T1–T4, 15–17 lift/drop/scissors, 21–25 and 50–52 the keys 1–8,
+    26 sequencer, 38/39/40 REC/PLAY/STOP, 41/42 left/right, 43 Shift, 48 mic/input, 49 COM
+  - encoders: CC 102–105 = blue/green/white/red, relative (1–63 up, 65–127 down); works on every screen
+  - mixer: CC 106–109 track 1–4 volume, 110–113 pan (64 = centre), 114–117 mute (≥ 64 = muted); CC 118 tape input
+    level
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -83,7 +98,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
@@ -118,7 +133,7 @@ The patch data is generated from a custom firmware tree built with the synth SDK
 not part of this repository; needs the Blackfin toolchain):
 
 ```sh
-python3 <sdk>/synth_sdk/make_firmware.py --opz                    # builds <sdk>/op1_246_custom/
+python3 <sdk>/synth_sdk/make_firmware.py --opz --release          # builds <sdk>/op1_246_custom/
 python3 build_patch.py /path/to/op1_246.op1 <sdk>/op1_246_custom  # regenerates data/ + reference image
 ```
 

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>op1r – OP-1 custom firmware patcher</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; background: #111; color: #eee; max-width: 680px; margin: 40px auto; padding: 0 16px; }
+  h1 { font-weight: 600; } a { color: #4D9EFF; }
+  #drop { border: 2px dashed #6F7173; border-radius: 12px; padding: 48px 16px; text-align: center; cursor: pointer; }
+  #drop.over { border-color: #00ED95; }
+  #log { background: #000; padding: 12px; border-radius: 8px; white-space: pre-wrap; font: 13px/1.4 monospace; min-height: 4em; }
+  .ok { color: #00ED95; } .err { color: #FF3A5D; } .warn { color: #FFD24D; }
+  #dl { display: none; margin: 16px 0; padding: 12px 20px; background: #00ED95; color: #000; border-radius: 8px; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>op1r – OP-1 custom firmware</h1>
+<p>Turns the original Teenage Engineering OP-1 firmware <b>R246</b> (<code>op1_246.op1</code>) into the op1r custom
+firmware. Everything runs in your browser: your firmware file is <b>not uploaded</b> anywhere.</p>
+<ol>
+  <li>Get the original <code>op1_246.op1</code> from teenage.engineering.</li>
+  <li>Drop it below (or click to choose it) and wait about half a minute.</li>
+  <li>Download the result and install it like any OP-1 update (bootloader update mode).</li>
+</ol>
+<div id="drop">Drop <code>op1_246.op1</code> here, or click to choose<input id="file" type="file" accept=".op1" hidden></div>
+<a id="dl" download="op1_246_op1r.op1">Download op1_246_op1r.op1</a>
+<pre id="log"></pre>
+<p>The original firmware can always be flashed back. Use at your own risk.
+<a href="https://github.com/pcppcp/op1r">Source, changelog and command-line patcher</a>.</p>
+<script>
+const $ = (id) => document.getElementById(id);
+const log = (t, cls) => { const s = document.createElement('span'); if (cls) s.className = cls; s.textContent = t + '\n'; $('log').append(s); };
+let busy = false;
+const worker = new Worker('worker.js', { type: 'module' });
+worker.onerror = (e) => { busy = false; log('ERROR: ' + (e.message || 'the patcher could not start (no internet connection?)'), 'err'); };
+worker.onmessage = ({ data: m }) => {
+  if (m.type === 'log') return log(m.text);
+  busy = false;
+  if (m.type === 'error') return log('ERROR: ' + m.text, 'err');
+  const url = URL.createObjectURL(new Blob([m.out], { type: 'application/octet-stream' }));
+  $('dl').href = url; $('dl').style.display = 'inline-block';
+  if (m.exact) log(`OK: sha256 ${m.sha}\nmatches the reference build.`, 'ok');
+  else log(`Content verified identical to the reference, but the compressed file differs (sha256 ${m.sha}).\n` +
+           'It should still install; please report this.', 'warn');
+};
+function run(file) {
+  if (busy || !file) return;
+  busy = true; $('log').textContent = ''; $('dl').style.display = 'none';
+  log(`reading ${file.name} (${file.size.toLocaleString()} bytes) ...`);
+  file.arrayBuffer().then((b) => worker.postMessage(b, [b]));
+}
+$('drop').onclick = () => $('file').click();
+$('file').onchange = (e) => run(e.target.files[0]);
+$('drop').ondragover = (e) => { e.preventDefault(); $('drop').classList.add('over'); };
+$('drop').ondragleave = () => $('drop').classList.remove('over');
+$('drop').ondrop = (e) => { e.preventDefault(); $('drop').classList.remove('over'); run(e.dataTransfer.files[0]); };
+</script>
+</body>
+</html>

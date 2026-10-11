@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Maintainer tool: build patcher/data/ from the original firmware and the custom firmware tree.
 
-    synth_sdk/make_firmware.py --opz                    # builds ../op1_246_custom/ (unpacked tree)
+    synth_sdk/make_firmware.py --opz --release          # builds ../op1_246_custom/ (unpacked tree)
     patcher/build_patch.py op1_246.op1 op1_246_custom   # -> patcher/data/ + reference image
 
 Compares every file of the original image with the custom tree and records only the differences:
@@ -80,6 +80,11 @@ def main():
     blobdir = P.DATA
     os.makedirs(os.path.join(blobdir, 'files'))
     patched, added = [], []
+    import re                                                     # local builds stamp the boot text with the time
+    ldr = open(os.path.join(a.custom, 'OP1_vdk.ldr'), 'rb').read()
+    if re.search(rb'op1r \d+ \d{4}-\d\d-\d\d \d\d:\d\d', ldr):
+        sys.exit('ERROR: the custom tree is a local build (build time on the boot screen); '
+                 'rebuild with make_firmware.py --opz --release')
     for root, _, files in os.walk(a.custom):
         for fn in sorted(files):
             full = os.path.join(root, fn)

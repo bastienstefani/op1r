@@ -3,6 +3,74 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 11:28 — op1r 10
+
+Output `a3b0b6478dac3398a8fc0bb370aaf41f86e519116c869e63da7e2bd010984758`
+
+### Added
+- **MIDI CC control** (USB MIDI, OP-1 MIDI channel):
+  - all front-panel keys except the keyboard: CC = key code + 5 (the OP-1 CTRL mode numbering), value ≥ 64 = press,
+    < 64 = release, so combinations like REC + PLAY or Shift + key work. Transport: CC 38 REC, 39 PLAY, 40 STOP
+  - the four encoders as relative CCs 102–105 (1–63 up, 65–127 down)
+  - mixer: CC 106–109 track volume, 110–113 track pan (64 = centre), 114–117 track mute; CC 118 tape input level
+  - CC 1–4 still go to the MIDI LFO; encoder presses are not mapped (CC 64 is the sustain pedal)
+
+### Changed
+- Boot screen version: `op1r 10`.
+- `build_patch.py` refuses local builds (build time on the boot screen); build with `make_firmware.py --opz --release`.
+
+## 2026-10-11 09:20 — op1r 9
+
+Output `6057c2258b75741a69611b6f52cc577279e48be3fcbd3af025ccdc46cc2b64cd`
+
+### Fixed
+- quad LFO settings, custom FX page-2 values (clouds pitch, dry/wet, reverb) and the granular sample gain are now
+  written into the instrument's patch, so they are saved with it. (Picking another LFO / FX / engine type still
+  loads that type's defaults, as on the stock OP-1.)
+
+### Changed
+- Boot screen version: `op1r 9`.
+
+## 2026-10-11 08:35 — op1r 8
+
+Output `794934277973cd8a8ad9a3b2ec3f51149a6e15284dfac34793536f487d4da90a`
+
+### Added
+- quad LFO: **Shift page** with a table of all four LFOs. Blue frequency (Hz) or tempo division, green smoothing
+  (0–7), white waveform (sine, triangle, ramp up, ramp down, square, sample & hold), red tempo sync on/off
+  (4/1, 2/1, 1/1, 1/2, 1/4, 1/4T, 1/8, 1/8T, 1/16, 1/16T, 1/32).
+- Patches saved with earlier versions keep their LFO frequencies (sine, free, no smoothing).
+
+### Changed
+- Boot screen version: `op1r 8`.
+
+## 2026-10-10 21:18 — op1r 7
+
+Output `ce6405cfe24c8f9fea06df67a13477fb51f1e6d247a2405b807dd49bbf88174c`
+
+### Added
+- granular: the **input** key opens "keyboard to sample" on a granular slot like on the sampler; the recording goes
+  into the slot's sample buffer and is saved. The slot stays granular with its knobs (no switch to the sampler).
+- granular: **red press** toggles page 2 = sample gain (0–4×, default 1×), stored per slot; the red dial gets a ring
+  and shows the gain.
+
+### Changed
+- Boot screen version: `op1r 7`.
+
+## 2026-10-10 20:43 — op1r 6
+
+Output `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1`
+
+### Added
+- Euclid: **level per slot** (note velocity 1–127, default 100) on page 2 of the red encoder, stored per pattern and
+  saved. Always shown as a red bar at the right border (dim above the level); a triangle marks red page 2.
+- Euclid: **lift / drop / scissors** on the euclid screen copy / paste / cut the selected slot; with **Shift** the whole
+  pattern. Running slots keep running.
+- Custom synth engines (supersaw, fmbell, granular) follow note velocity (euclid level, MIDI in).
+
+### Changed
+- Boot screen version: `op1r 6`.
+
 ## 2026-10-10 — study tools (patch output unchanged)
 
 Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (same as op1r 5)
@@ -12,6 +80,8 @@ Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (same 
 - `tools/`: `analyze.sh`, `fwtool.py` (LDR/memory/xref helpers), `fwbuild.py` (experimental image builder),
   `build_bfin_toolchain.sh` (binutils + GCC for bfin-elf).
 - `examples/midi-panic`: C hook example (Shift + key → MIDI All Notes Off), not flash-tested.
+- `examples/pianoroll`: a piano-roll sequencer built on top of op1r (new 'roll' entry, grid screen, polyphonic
+  playback, note editing); a study example, developed against op1r 5.
 
 ## 2026-10-10 18:44 — op1r 5
 
