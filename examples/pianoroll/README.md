@@ -64,6 +64,19 @@ en nombre de pas.
 
 Limite connue : changer l'octave pendant la lecture peut laisser une note bloquée (comme l'euclid d'op1r).
 
+## Revenir à op1r ou au firmware d'origine
+
+Quand « roll » est le séquenceur choisi, son nom est enregistré dans `op1.db` (table `sequencer`). Un firmware
+qui ne connaît pas « roll » (op1r seul, ou l'original) s'arrête alors **au démarrage** sur l'assertion
+`SeqIds.cpp:41 unknown sequencer name: 'roll'`. Avant de flasher une autre image :
+
+1. dans l'image roll, choisir un autre séquenceur (pattern, finger, euclid…) **en mode synth et en mode drum** ;
+2. puis flasher l'autre image.
+
+Si c'est trop tard (l'OP-1 s'arrête au démarrage), reflasher l'image roll (le mode mise à jour du bootloader ne
+dépend pas du système) et faire l'étape 1. En dernier recours, le « factory reset » du bootloader remet `op1.db`
+à zéro (efface les données utilisateur).
+
 ## Fichiers
 
 | Fichier | Rôle |

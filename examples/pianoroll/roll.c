@@ -434,11 +434,16 @@ static void roll_dirty(void) {
 static const void *roll_saver_vt[6] = { 0, 0, 0, (void*) roll_nop, 0, (void*) roll_save };
 
 /* ------------------------------------------------------------------ hooks (each chains to op1r's) */
+/* A valid stock name ("arpeggio", our host), as a std::string with the inline buffer (cap < 16).  Never pass
+ * "roll" itself to op1r's hook: for a non-euclid name it jumps to the stock idFromName (01a42344), which asserts
+ * "SeqIds.cpp:41 unknown sequencer name" and halts - at boot, when "roll" is the saved sequencer. */
+static te_string host_name = { 0, { "arpeggio" }, 8, 15 };
+
 int32_t rp_id_from_name(const te_string *s) {
     int m = (fw_mode == 1);
     if (streq(te_cstr(s), "roll")) {
         if (!roll[m].inited) roll_defaults(&roll[m]);
-        op1r_id_from_name(s);       /* side effect: clears op1r's euclid flag for this mode ("roll" != "euclid") */
+        op1r_id_from_name(&host_name);  /* side effect: op1r clears its euclid flag for this mode */
         roll_flag[m] = 1;
         return HOST_ID;
     }
@@ -466,9 +471,10 @@ static int roll_showing(void) {
 void *rp_build_screens(void) {
     void *ret = op1r_build_screens();
     int i;
-    roll_defaults(&roll[0]);
-    roll_defaults(&roll[1]);
-    roll_flag[0] = roll_flag[1] = 0;
+    /* The saved sequencer is loaded BEFORE the screens are built (OP_Main: Core init -> 01a42ba0 -> idFromName),
+     * so roll_flag may already be set here: keep it (bss starts at 0) and only fill state not yet initialised. */
+    if (!roll[0].inited) roll_defaults(&roll[0]);
+    if (!roll[1].inited) roll_defaults(&roll[1]);
     roll_stock_arp_scr = fw_screen_reg[HOST_SCREEN];
     fw_screen_ctor(roll_scr_obj, HOST_SCREEN, "roll.svg");
     fw_screen_reg[HOST_SCREEN] = roll_stock_arp_scr;
@@ -491,6 +497,7 @@ void *rp_build_screens(void) {
 void rp_init_screens(void) {
     op1r_init_screens();
     roll_ready = 1;
+    roll_update_slot();                                 /* roll may already be the saved sequencer */
 }
 
 /* encoder-press key codes (blue/green/white/red) while the roll screen is up */
