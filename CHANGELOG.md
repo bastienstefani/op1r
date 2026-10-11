@@ -3,6 +3,18 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-11 09:20 — op1r 9
+
+Output `6057c2258b75741a69611b6f52cc577279e48be3fcbd3af025ccdc46cc2b64cd`
+
+### Fixed
+- quad LFO settings, custom FX page-2 values (clouds pitch, dry/wet, reverb) and the granular sample gain are now
+  written into the instrument's patch, so they are saved with it. (Picking another LFO / FX / engine type still
+  loads that type's defaults, as on the stock OP-1.)
+
+### Changed
+- Boot screen version: `op1r 9`.
+
 ## 2026-10-11 08:35 — op1r 8
 
 Output `794934277973cd8a8ad9a3b2ec3f51149a6e15284dfac34793536f487d4da90a`
