@@ -13,43 +13,43 @@
   {
    "path": "OP1_vdk.ldr",
    "orig_sha256": "f79d299f6f9019c998013a4176223a6a1bc999a2d8c54451346861f6ea455c74",
-   "result_sha256": "33fd2be1ebf53261b37f5d890fd8a8efaed8ac9afdbcc7b37be26adeeda22b25",
+   "result_sha256": "7ec4b6ffc2f65ce6d40ca707a9eea9829213c12040acf8558bb12ec4324a42be",
    "ops": [
     {
      "op": "replace",
      "offset": 2,
      "old": "7f",
-     "new": "17"
+     "new": "62"
     },
     {
      "op": "replace",
      "offset": 12,
      "old": "d82221",
-     "new": "48d823"
+     "new": "10f523"
     },
     {
      "op": "replace",
      "offset": 313970,
-     "old": "522e2030303234",
-     "new": "206f7031722031"
+     "old": "522e203030323436",
+     "new": "206f703172203137"
     },
     {
      "op": "replace",
      "offset": 317152,
      "old": "26bfa3",
-     "new": "9828e1"
+     "new": "483ae1"
     },
     {
      "op": "replace",
      "offset": 317276,
      "old": "d0bfa3",
-     "new": "a428e1"
+     "new": "543ae1"
     },
     {
      "op": "replace",
      "offset": 317408,
      "old": "78c0a3",
-     "new": "ce28e1"
+     "new": "7e3ae1"
     },
     {
      "op": "replace",
@@ -61,19 +61,19 @@
      "op": "replace",
      "offset": 416328,
      "old": "68ce9c010000000030ce9c",
-     "new": "da28e10100000000dc42e0"
+     "new": "8a3ae101000000007044e0"
     },
     {
      "op": "replace",
      "offset": 416360,
      "old": "48d09c01000000002ece9c",
-     "new": "2629e101000000003043e0"
+     "new": "d63ae10100000000c444e0"
     },
     {
      "op": "replace",
      "offset": 416392,
      "old": "04d19c01000000002cce9c",
-     "new": "0029e101000000008443e0"
+     "new": "b03ae101000000001845e0"
     },
     {
      "op": "replace",
@@ -86,6 +86,18 @@
      "offset": 417488,
      "old": "e47e9e0100000000d0789e",
      "new": "3008e001000000001808e0"
+    },
+    {
+     "op": "replace",
+     "offset": 421280,
+     "old": "40e2a5",
+     "new": "04c7e0"
+    },
+    {
+     "op": "replace",
+     "offset": 458076,
+     "old": "044841e1a0ff",
+     "new": "b0c641e1e001"
     },
     {
      "op": "replace",
@@ -133,13 +145,13 @@
      "op": "replace",
      "offset": 1055476,
      "old": "38080b10",
-     "new": "23e34e30"
+     "new": "23e32639"
     },
     {
      "op": "replace",
      "offset": 1056444,
      "old": "01080710",
-     "new": "23e37d2e"
+     "new": "23e35537"
     },
     {
      "op": "replace",
@@ -163,13 +175,13 @@
      "op": "replace",
      "offset": 1146750,
      "old": "ffe39b9f",
-     "new": "21e3d7f3"
+     "new": "21e339f4"
     },
     {
      "op": "replace",
      "offset": 1147092,
      "old": "ffe3bc9e",
-     "new": "21e3c6f6"
+     "new": "21e38ef7"
     },
     {
      "op": "replace",
@@ -193,19 +205,19 @@
      "op": "replace",
      "offset": 1269592,
      "old": "00601000",
-     "new": "21e2da8d"
+     "new": "21e2b296"
     },
     {
      "op": "replace",
      "offset": 1279908,
      "old": "a5e60900",
-     "new": "21e2be79"
+     "new": "21e29682"
     },
     {
      "op": "replace",
      "offset": 1281082,
      "old": "03e3fdd6",
-     "new": "20e397f0"
+     "new": "20e35ff1"
     },
     {
      "op": "replace",
@@ -229,7 +241,7 @@
      "op": "replace",
      "offset": 1333822,
      "old": "02e33f59",
-     "new": "20e36785"
+     "new": "20e39985"
     },
     {
      "op": "replace",
@@ -313,14 +325,14 @@
      "op": "replace",
      "offset": 1945430,
      "old": "ffe381f9",
-     "new": "1be339de"
+     "new": "1be301df"
     },
     {
      "op": "insert",
      "offset": 2171347,
      "blob": "OP1_vdk.ldr.insert.bin",
-     "sha256": "f70886d70e9e30e7761fc84954afa9d055f02422e5d3b42fc65e3cad46d3e025",
-     "size": 177520
+     "sha256": "5ed1a7447a379a546a2108fd5f3e3b514fb9ec4c95017c92435c5fb5c4da27a1",
+     "size": 184888
     }
    ]
   },
@@ -478,6 +490,12 @@
    "template": "content/display/adsr.svg"
   },
   {
+   "path": "content/display/sysmon.svg",
+   "blob": "files/content_display_sysmon.svg",
+   "sha256": "d360583247e632913ccd534a0bb4a3e288edfca00197d5f87e6fc551e0f30cf4",
+   "template": "content/display/adsr.svg"
+  },
+  {
    "path": "content/display/tapeecho.svg",
    "blob": "files/content_display_tapeecho.svg",
    "sha256": "50c745dbd43356261e8283f69c0248dcaba0a1bd39b85dd73ff9e216d07a350b",
@@ -485,8 +503,8 @@
   }
  ],
  "result": {
-  "tar_sha256": "240b3b826de8ee19bb8cfe531de2fc68dc60b5cc033809ad86e26272dd365c39",
-  "sha256": "7d49979e0e01927281898b9a0fcc49d09633650cb427b1bf15961113a77e67df",
-  "size": 12836632
+  "tar_sha256": "a26d25608c8730cc57cb4c2a375873bd6519343334fca4221a9f68e102692634",
+  "sha256": "118e6fe845d4d66cb400d7d65da76438a739d4a2031f8efc3ddb48a7423a6be1",
+  "size": 12839472
  }
 }

@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 14:17 — op1r 17
+
+Output `118e6fe845d4d66cb400d7d65da76438a739d4a2031f8efc3ddb48a7423a6be1`
+
+### Added
+- **Resource monitor**: clock screen (Shift + help), then **T1**: CPU (total, from the idle time), audio (time spent
+  in audio processing, with a peak marker), RAM (both heaps), disk (used / total) and the MIDI in / out buffer fill
+  (peak, %). T1 again returns to the clock.
+
+### Changed
+- quad LFO: an LFO can no longer target itself (white skips its own F / A / O). With one target per LFO a self
+  target had no audible effect; such stored targets are ignored.
+- Boot screen version: `op1r 17`.
+
 ## 2026-10-12 11:23 — op1r 16
 
 Output `7d49979e0e01927281898b9a0fcc49d09633650cb427b1bf15961113a77e67df`

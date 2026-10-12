@@ -26,8 +26,8 @@ with:
     red fades in the fire
 - **quad** LFO: four LFOs in one slot, one row each: live output, frequency, amount, target and type
   - blue frequency (0.05–20 Hz) or tempo division, green amount (±100 %), white target (synth / drum engine knob,
-    envelope A D S R, FX knob, or another LFO's frequency / amount / phase offset (F / A / O, self included), shown as a
-    symbol plus a dot in the knob / LFO colour), red type
+    envelope A D S R, FX knob, or another LFO's frequency / amount / phase offset (F / A / O), shown as a
+    symbol plus a dot in the knob / LFO colour; an LFO can't target itself), red type
   - types: **VOIC** (per voice), **FREE** (free-running), **GATE** (restarts at note-on), **MONO** (restarts at every
     note-on, shared), **SHOT** (one cycle after note-on, then holds), **RAND** (new random value per note)
   - press an encoder to select LFO 1–4
@@ -51,6 +51,9 @@ with:
     pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
+- **resource monitor**: on the clock screen (**Shift + help**) press **T1** to switch to a page with CPU load,
+  audio processing load (both with a peak marker), RAM and disk usage and the MIDI in / out buffer fill; T1 again
+  goes back to the clock
 - **MIDI CC control** (USB MIDI, on the OP-1's MIDI channel):
   - keys: CC = key code + 5 as in the OP-1's own CTRL mode, value ≥ 64 press / < 64 release: 5 help, 6 metronome,
     7–10 synth/drum/tape/mixer, 11–14 T1–T4, 15–17 lift/drop/scissors, 21–25 and 50–52 the keys 1–8,
@@ -124,7 +127,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `7d49979e0e01927281898b9a0fcc49d09633650cb427b1bf15961113a77e67df` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `118e6fe845d4d66cb400d7d65da76438a739d4a2031f8efc3ddb48a7423a6be1` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
