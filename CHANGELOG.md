@@ -3,6 +3,23 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 — documentation and checks (patch output unchanged)
+
+Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (same as op1r 12)
+
+### Added
+- `docs/developpement.md`: guide for picking the work up (state, build/check commands, memory map, hook chains,
+  reserved ids, procedures for a new op1r version or a third-party base, pitfalls, known limits). `CLAUDE.md`.
+- `tools/fwcheck.py`: offline checks of a built image (diff against a reference, LDR structure, overlaps, memory,
+  databases; outgoing calls and addresses used by a code block; block hash).
+- `examples/run_tests.sh` runs every host test; `pianoroll/test_beat.c` (beat-aligned start, now in `beat.h`),
+  `drive/test_ui.c` + `render_ui.py` (screen preview).
+- `docs/firmware-r246.md`: hosting an FX on top of op1r, preset browsers, sequencer clock and player vtable, heap,
+  memory map for op1r 12 and op1_249.
+
+### Changed
+- Example READMEs: status per feature, wiring, internals. Built images are byte-identical to the previous push.
+
 ## 2026-10-11 — examples rebuilt on op1r 12 (patch output unchanged)
 
 Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (same as op1r 12)

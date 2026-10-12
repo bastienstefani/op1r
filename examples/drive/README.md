@@ -3,9 +3,20 @@
 Distorsion pour l'OP-1 (R246), ajoutée **par-dessus op1r 12 et le piano roll** comme nouvelle entrée « drive » de la
 liste des effets. Le fonctionnement s'inspire du module Distortion de Serum (modes de waveshaping, drive, filtre
 avant ou après, mix). L'écran reprend son affichage (courbe de transfert, forme d'onde déformée) dans le langage
-visuel de l'OP-1 : fond noir, traits fins, une couleur par encodeur. Exemple d'étude pour
-[docs/firmware-r246.md](../../docs/firmware-r246.md). **Non testé sur matériel.** Le firmware d'origine et l'image
-op1r se reflashent toujours (le bootloader n'est pas modifié).
+visuel de l'OP-1 : fond noir, traits fins, une couleur par encodeur. Le firmware d'origine et l'image op1r se
+reflashent toujours : le bootloader n'est pas modifié.
+
+Pour reprendre le développement (architecture, chaîne des hooks, mise à jour d'op1r), voir
+[docs/developpement.md](../../docs/developpement.md).
+
+## État
+
+| Fonction | État |
+|---|---|
+| Entrée « drive », écran, son | flashé sur op1r 12 puis sur op1_249 : premiers retours bons |
+| Détail des modes, page 2 (filtre, résonance, niveau), sauvegarde avec le son, master, batterie | à confirmer un par un (liste ci-dessous) |
+| Modulation par LFO, course des encodeurs d'origine (drive, fréquence, mix) | non vérifiées |
+| DSP, hooks, écran | testés sur PC (`examples/run_tests.sh`) |
 
 Les modes sont nos propres formules, nommées d'après ceux de Serum et réglées pour s'en approcher à l'oreille : ce
 ne sont pas les courbes de Serum.
@@ -93,6 +104,26 @@ s'arrêtera alors **au démarrage** sur l'assertion `fx_types.cpp:42 unknown fx 
 flasher une autre image, choisir un autre effet sur **chaque son** (slots synthé et batterie) qui utilise drive. Le
 master n'est pas concerné (il est enregistré comme « filter »). Pour le piano roll, la même règle s'applique (voir [../pianoroll/README.md](../pianoroll/README.md)).
 
+## Paramètres et état interne
+
+| Paramètre | Rôle | Plage stockée |
+|---|---|---|
+| 0 | drive (bleu, page 1) | bornes de filter, normalisées par `norm()` |
+| 1 | mode (vert, page 1) | idem ; 13 zones, le vert pose le centre d'une zone |
+| 2 | fréquence (blanc, page 1) | idem |
+| 3 | mix (orange, page 1) | idem |
+| 4 | **marqueur `0x5304`** | jamais modifié |
+| 5 | routage × type de filtre (9 zones) | 0..32767 |
+| 6 | résonance | 0..32767 |
+| 7 | niveau | 0..32767 |
+
+- Les valeurs par défaut sont dans la ligne SQL de `build.sh` : drive 30 %, TUBE, 550 Hz, mix ≈ 100 %, filtre
+  OFF, résonance 20 %, 0 dB. Les paramètres 0 à 3 restent à l'intérieur des bornes de secours d'op1r.
+- Il y a quatre états DSP : synth, batterie, master gauche et droite. Ils sont remis à zéro à chaque
+  `set_position`.
+- La crête de chaque bloc remonte vers l'écran pour le point blanc.
+- La page affichée (`dv_page`) est globale.
+
 ## Comment c'est branché
 
 Exactement comme les effets d'op1r (tape, clouds, reverb), sur l'effet d'origine caché « filter » (id interne 5) :
@@ -118,5 +149,8 @@ chaque site avant de construire.
 | `drive.ld` | lien avec le piano roll à `01ee0000`, adresses R246 et op1r 12 |
 | `tables.h`, `gen_tables.py` | tables (sinus, drive, fréquence, niveau), générées |
 | `test_host.c` | test du DSP sur PC sous UBSan : toutes les combinaisons de réglages, pas de débordement |
-| `test_hooks.c` | test des hooks sur PC contre un firmware simulé |
-| `build.sh` | vérifie op1r, compile roll + drive, lie, puis `tools/fwbuild.py` |
+| `test_hooks.c` | test des hooks sur PC contre un firmware simulé (`-DDV_HOST`) |
+| `test_ui.c`, `render_ui.py` | aperçu de l'écran sur PC, dessiné avec le même code (PNG, Pillow) |
+| `build.sh` | vérifie op1r (ou la base), compile roll + drive, lie, puis `tools/fwbuild.py` |
+
+Tous les tests sur PC : `examples/run_tests.sh`.

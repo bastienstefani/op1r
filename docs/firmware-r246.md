@@ -81,10 +81,10 @@ Reconstruite à partir des blocs (`tools/fwtool.py mem`) — **vérifié** :
 |---|---|
 | `00000000-01000000` | rien de chargé par `OP1_vdk.ldr` ; `te-boot` y tourne (`00000004-00029294`) pendant le chargement |
 | `01000000-01001ea8` | table de 256 pointeurs de fonction terminée par 0 (`01000000`, *déduit* : constructeurs statiques C++) et données |
-| `01001ea8-018ab7cc` | BSS (8,7 Mo mis à zéro) |
+| `01001ea8-018ab7cc` | BSS (8,7 Mo mis à zéro), dont le **tas** : une arène de `0x840000` octets, de descripteur `0106b7cc`, créée par `01a5e364` (*déduit* : de `0106b7cc` jusqu'à `018ab7cc`) |
 | `018ab7cc-01aa7078` | **données en lecture + code** (2 Mo) : chaînes, tables, vtables, puis le code C++ |
 | `01aa7078-01dfff34` | BSS (3,4 Mo) |
-| `01dfff34-01f00000` | **libre** (~1 Mo) — op1r y charge son code à `01e00000-01e17e88`, ses variables suivent (jusqu'à ~`01e20000`, *déduit*) |
+| `01dfff34-01f00000` | **libre** (~1 Mo) : op1r 12 y charge `01e00000-01e2a1d0` (BSS comprise), les exemples roll/drive `01ee0000` ; carte détaillée dans [developpement.md](developpement.md) §6.2 |
 | `01f00000-01f21308` | données/BSS de `te-boot` (actif pendant le chargement : ne rien y charger) |
 | `02000000-02025800`, `02040000-027ffb04` | grandes zones mises à zéro (buffers : *déduit* audio/bande/écran) |
 | `03000000-0303ffff` | zone mise à zéro |
@@ -92,9 +92,9 @@ Reconstruite à partir des blocs (`tools/fwtool.py mem`) — **vérifié** :
 | `ffb00000-ffb01000` | scratchpad L1 : objets voix / FX / LFO construits sur place |
 | `ffa00000-ffa0bfb4` | L1 code (encodé), point d'entrée |
 
-Conséquence pratique : du code ajouté doit être chargé dans `01dfff34-01f00000` (au-dessus d'op1r si on part
-d'op1r : l'exemple de la section 11 utilise `01e80000`), jamais dans les zones de `te-boot`, qui serait écrasé
-pendant qu'il charge l'image.
+Conséquence pratique : du code ajouté doit être chargé dans `01dfff34-01f00000`, au-dessus d'op1r si on part
+d'op1r. midi-panic utilise `01e80000`, roll et drive `01ee0000`, parce qu'une image tierce (op1_249) occupe
+`01e40000-01eb7464`. Jamais dans les zones de `te-boot`, qui serait écrasé pendant qu'il charge l'image.
 
 ## 5. Organisation du programme
 
@@ -241,6 +241,44 @@ L1 `ffa0047c`), 64 trames stéréo par interruption, 44,1 kHz. Le pointeur du ca
 voix → FX → LFO → mixeur est en L1 (encodée), donc non lisible ici. Ordre *déduit* : voix → FX instrument
 (paramètres modulés par le LFO) → bande/mixeur → FX master → sortie.
 
+#### Héberger un nouvel effet par-dessus op1r (vérifié avec `examples/drive`)
+
+- **Aiguillage d'op1r** : les mots `process` / `set_position` du filter pointent vers op1r.
+  - Le marqueur est `params[4] = 0x5300 + n`. op1r n'accepte que `1 ≤ n < N`, avec `N` = 4 en op1r 12 (une
+    valeur dans ses données) ; sinon il appelle le filter d'origine.
+  - op1r garde un cache « dernier effet op1r » (mono et stéréo), qu'il remet à 0 quand l'effet n'est pas le sien.
+    drive fait de même avant de traiter un bloc.
+- **`process` mono** : `(this, int16 *buf, const int16 *p)`. Il reçoit 64 échantillons Q15, traités sur place.
+  - Pour un instrument, `p` est la copie modulée par le LFO (`ff801724`) ; pour le master, `ff8016c4`.
+  - Il tourne en interruption IVG11.
+- **`process` stéréo** (master) : `(this, L, R, p)`, avec le 4e argument sur la pile.
+- **`set_position(this, pos)`** : `pos & 1` donne l'instance (0 synth, 1 drum) ; les positions stéréo sont 2/3.
+  Elle tourne dans le fil de l'interface.
+- **Effet courant** :
+  - le contexte est `[01df4e3c]` : 0 synth, 1 drum, 3 master ;
+  - paramètres enregistrés : `ff801444 + 16 * ([ff8016d4] & 7)` (synth), `ff8015c4 + 16 * ([ff8016d8] & 7)`
+    (drum), `ff8016c4` (master) ;
+  - id interne de l'effet : `ff801734[slot]`, `ff801754[slot]`, `[ff801090]`. Il vaut 5 pour filter.
+- **Bornes** :
+  - `{min, max, pas}` en int16 à `01de5c50 + id * 0x30 + i * 6` ; la ligne de filter est en `01de5d40` ;
+  - elles sont calculées au démarrage, d'où le repli d'op1r si `min ≥ max` : `{64, 14528}`, `{0, 24576}`,
+    `{0, 22528}`, `{8192, 32767}` ;
+  - *Déduit* : les paramètres 4 à 7 acceptent 0..32767, puisque la page 2 d'op1r en dépend ;
+  - une valeur hors bornes fait échouer le patch (erreur 24) ou déclenche une assertion fatale à l'écran.
+- **Sauvegarder une modification** : `019ff664(patch, p)`, avec `patch = 01ddd7e8 + slot * 0x38` (synth) ou
+  `01ddd9a8 + slot * 0x38` (drum), écrit `fx_params` dans le JSON du son. Pour le master, seul le tableau est
+  écrit (comme op1r).
+- **Nom** : la comparaison de `fx_types` (`019aad8e`) prend `(char *nom_table, std::string *nom_base)` et renvoie
+  1 si les deux noms sont égaux.
+- **Écran** :
+  - le `case` 5 de ScreenId fx s'exécute dans le cadre du `switch` ; il se termine par `P0 = [FP + 4]; UNLINK;
+    JUMP (P0)` ;
+  - tous les effets op1r partagent l'écran `0xb` ; le choix d'op1r (`01e02018` en op1r 12) réécrit
+    l'emplacement `0xb` du registre à chaque appel.
+- **Encodeurs** : la page 1 est gérée par le firmware d'origine (bornes et pas de la table). Les appuis
+  d'encodeurs sont les touches `0x3b`-`0x3e`.
+- **LFO** : *déduit*, il ne module que `p[0..3]` de la copie.
+
 ### 8.3 LFO
 
 **Vérifié.** Table `lfo_types.cpp` (`01dd58e4`) : tremolo 0, value 1, random 2, element 3, midi 4, bend 5, crank 6
@@ -290,6 +328,22 @@ instance globale (`ffb00c10`).
   `key_dispatch` (`019b6c74`) et `encoder_dispatch` (`019b6c0c`) ; c'est le point de passage obligé pour un
   raccourci global (détails en 8.6).
 
+#### Navigateurs de presets (vérifié)
+
+- **Chargement** : au démarrage, `01a05680` lit `synth_presets` (base d'usine) puis `synth_user` (`op1.db`).
+  - Les presets vont dans le tableau `01dddb68` (0x38 octets par preset : JSON en +4, dossier en +0x14).
+  - Limites : sampler ≤ 42, synth ≤ 176, user ≤ 100, total ≤ 318.
+  - Un patch invalide est seulement signalé dans le journal ; il reste dans la liste.
+- **Choix du moteur** (Shift + T1, constructeur `01a02444`) :
+  - les entrées viennent de `synth_types`, donc avec les noms de types (« DRWAVE ») ;
+  - il n'y range des presets que pour le dossier « sampler » (`01a024f6`). Les autres moteurs ont donc une
+    colonne vide, c'est le comportement d'origine.
+- **Navigateur de presets** (Shift + 1…8, constructeur `01a02794`) : les entrées sont les dossiers des presets
+  (« DR WAVE »), avec tous leurs presets. Un moteur sans preset d'usine (fmbell, supersaw, granular, iter) n'y
+  apparaît pas.
+- **Sélection** : `01a50f8c` → `0193ffb0`. Un id > 0 charge les valeurs par défaut du moteur depuis
+  `synth_types` ; un id ≤ 0 charge le preset n° `-id` du tableau.
+
 ### 8.5 Séquenceurs
 
 **Vérifié.**
@@ -311,6 +365,28 @@ instance globale (`ffb00c10`).
 - **Horloge** : le fil séquenceur (`01a4318c`) attend un sémaphore (`[01df50b8]`) que le cœur DSP poste à chaque
   bloc. Il appelle `tick` (`01a0d2c0`), qui lit le MIDI entrant, gère l'horloge externe (« midi_ext_clock_in ») et
   appelle le tick virtuel des lecteurs actifs.
+- **Horloge** (vérifié avec `examples/pianoroll`) :
+  - 96 ticks par noire (les constantes 96.0 et 2646000.0 apparaissent dans le calcul du tempo) ;
+  - le tick passé aux lecteurs est le compteur `018c1884` **modulo 48** (une demi-noire) ; `018c187c` compte
+    modulo 4 (horloge MIDI) ;
+  - `01a5e7d0` remet les trois compteurs (`018c187c/80/84`) à zéro. Elle est appelée par PLAY (`019ac780`),
+    Start MIDI (`019e31a8`, qui remet aussi le métronome à zéro par `019de510`) et le départ des séquenceurs
+    d'origine ;
+  - le métronome lui-même est dans la L1 encodée.
+- **Vtable d'un lecteur** :
+  - `+0x0c` destructeur ;
+  - `+0x14` `key_down(self, touche, shift)`, qui renvoie 1 pour avaler la touche ;
+  - `+0x1c` `key_up` ;
+  - `+0x24` sortie du mode ;
+  - `+0x2c` `tick(self, tick48)` ;
+  - `+0x34` image ;
+  - `+0x3c` `stop`, qui doit pouvoir être appelé plusieurs fois.
+- **Lecteurs** : celui d'arpeggio est obtenu en `01a0d1b0` (`01a46400`), celui de finger en `01a0d150`. Écrans :
+  arpeggio `0x2c`, finger `0x2d`.
+- **Jouer des notes** depuis un lecteur :
+  - `01a85750(MidiNote *, demi-tons batterie)` et `01a85840(MidiNote *)`, avec
+    `MidiNote = {note, vélocité, midi = 1, pad, user}` ;
+  - octave du synthé courant : `01dfe4e0[slot]`.
 
 ### 8.6 Démarrage et boucle principale
 
@@ -406,6 +482,11 @@ la bande, *déduit* PLAY.
 - L'euclid d'op1r utilise ce même mécanisme avec sa propre table `euclidseq`.
 
 ## 9. Comment op1r s'insère : carte complète des modifications
+
+Cette carte a été dressée sur **op1r 5**. Les versions suivantes ont ajouté quelques sites (par exemple
+`019deef2` et `01a85c8a` pour dots). Surtout, **les adresses dans le bloc op1r changent à chaque version** : les
+valeurs actuelles de ce que les exemples utilisent sont dans [developpement.md](developpement.md) §6.3, et
+`fwtool.py hooks` donne la liste complète pour une version donnée.
 
 `tools/fwtool.py hooks work/orig --funcs work/funcs.json` liste toutes les modifications de `OP1_vdk.ldr` :
 45 remplacements (2 dans l'en-tête LDR, le texte de démarrage, 9 tables, 33 branchements) et 1 insertion (le bloc
@@ -511,8 +592,11 @@ qui est testée sur matériel. **L'exemple lui-même n'a pas été flashé.**
 
 ### Contraintes
 
-- **Où charger** : `01dfff34-01f00000` seulement. op1r occupe `01e00000-~01e20000` (*déduit* de ses adresses).
-  Le code SDRAM d'origine ne référence jamais `01e0xxxx-01ffxxxx`.
+- **Où charger** : `01dfff34-01f00000` seulement.
+  - op1r 12 occupe `01e00000-01e2a1d0` (`fwcheck.py refs` sur son code) ; d'autres patchs construits sur op1r
+    peuvent occuper davantage (op1_249 : `01e40000-01eb7464`).
+  - Le code SDRAM d'origine ne référence jamais `01e0xxxx-01ffxxxx`.
+  - Carte détaillée dans [developpement.md](developpement.md) §6.2.
 - **Portée des branchements** : `CALL`/`JUMP.L` pcrel24 = ±16 Mo, suffisant de `01e8xxxx` vers tout le code
   `018a-01aa`. Pour la L1 (`ffa0xxxx`), il faut un appel indirect `CALL (P1)`.
 - **Contexte d'exécution** : clavier = fil KeyHandler ; séquenceur = fil séquenceur ; audio = interruption
@@ -531,7 +615,8 @@ qui est testée sur matériel. **L'exemple lui-même n'a pas été flashé.**
 | Mode **euclidien du séquenceur endless** | champs `euclidean` / `euclidean_offset` déjà présents dans les données endless (`018d59e0`) : chercher qui les lit dans `EndlessPlayer` | étude |
 | **Commandes SysEx TE** 02/03/04 | parseur `019e31a8` ; ajouter une commande (ex. charger un preset, régler un paramètre à distance) au même endroit qu'op1r (`019e3540`) | moyenne |
 | **LFO → MIDI CC** (envoyer la modulation vers l'extérieur) | `process` d'un LFO (vtable) + `019e3004(cc, v)` à débit limité | moyenne |
-| Nouveau moteur / FX / LFO / séquenceur | recette de la section 10, ou étendre les tables de descripteurs d'op1r (`01e0ce1c`, `01e0cdb0`) | élevée |
+| Nouveau moteur / FX / LFO / séquenceur | recette de la section 10 ; faits : séquenceur [`examples/pianoroll`](../examples/pianoroll), effet [`examples/drive`](../examples/drive) | élevée |
+| Presets pour les moteurs d'op1r | lignes `synth_presets` (dossier = nom du moteur), sans code ; ou presets par moteur dans Shift + T1 (constructeur `01a02444`, 8.4) | faible / moyenne |
 | Raccourcis Shift supplémentaires | `key_hook()` de l'exemple + table des codes (section 8.6) | faible |
 
 ## 12. Outils
@@ -549,7 +634,8 @@ Tous en Python 3 standard, sauf le désassembleur et le compilateur (GNU, constr
 | `tools/fwtool.py branch` | cible du `CALL`/`JUMP.L` à une adresse |
 | `tools/fwtool.py xref` | carte heuristique des fonctions : prologues + cibles d'appel, chaînes référencées, fichier source d'après les assertions, appelants |
 | `tools/fwtool.py hooks` | toutes les modifications d'op1r décodées (ancienne / nouvelle cible) |
-| `tools/fwbuild.py` | construit un `.op1` : `--op1r`, `--blob F@ADDR`, `--call`, `--jump`, `--word`, `--bytes`, `--text`, `--file`, `--sql` |
+| `tools/fwbuild.py` | construit un `.op1` : `--op1r` ou `--base IMAGE`, `--blob F@ADDR`, `--call`, `--jump`, `--word`, `--bytes`, `--text`, `--file`, `--sql` |
+| `tools/fwcheck.py diff / calls / refs / blockhash` | vérifie une image avant de la flasher : ce qu'elle change par rapport à une référence (fichiers, structure LDR, mémoire, bases) ; appels sortants et adresses utilisées par un bloc de code ; empreinte d'un bloc (voir [developpement.md](developpement.md) §5) |
 | `tools/build_bfin_toolchain.sh [--binutils-only]` | binutils 2.42 + GCC 14.2 pour `bfin-elf` |
 
 Pour lire le désassemblage : objdump affiche en commentaire la valeur complète d'un registre chargé en deux
