@@ -54,6 +54,10 @@ with:
 - **resource monitor**: on the clock screen (**Shift + help**) press **T1** to switch to a page with CPU load,
   audio processing load (both with a peak marker), RAM and disk usage and the MIDI in / out buffer fill; T1 again
   goes back to the clock
+- **USB track outs**: the OP-1 shows up as a 6-channel USB audio input (24 bit, 44.1 kHz): main L/R on channels
+  1–2, tape tracks 1–4 on channels 3–6 (pre-fader, following tape speed and reverse). Clock screen + **T2**: the blue
+  knob switches between **MASTER** (track channels silent, saves 5–7 % CPU; default) and **MASTER + TRACKS**; the
+  setting is saved
 - **MIDI CC control** (USB MIDI, on the OP-1's MIDI channel):
   - keys: CC = key code + 5 as in the OP-1's own CTRL mode, value ≥ 64 press / < 64 release: 5 help, 6 metronome,
     7–10 synth/drum/tape/mixer, 11–14 T1–T4, 15–17 lift/drop/scissors, 21–25 and 50–52 the keys 1–8,
@@ -136,7 +140,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `ca667abb81f458f6039d9959383a0ecce56f34f8fb6e811392f0c787affb894a` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `dbbf0a66c16903681dc2851b5444a69bd22a65bf92842baa9449cf6459a754e1` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

@@ -3,6 +3,21 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 20:59 — op1r 19
+
+Output `dbbf0a66c16903681dc2851b5444a69bd22a65bf92842baa9449cf6459a754e1`
+
+### Added
+- **USB track outs**: USB audio to the computer has 6 channels: main L/R (1–2) and tape tracks 1–4 (3–6),
+  pre-fader, following tape speed and reverse, gap-free across the loop point.
+- **USB out page**: clock screen (Shift + help), then **T2**; blue switches MASTER / MASTER + TRACKS at once, saved.
+  MASTER (default) silences the track channels and saves 5–7 % CPU.
+
+### Changed
+- USB audio input is now 6 channels instead of 2 (a DAW sees main L/R on inputs 1–2 as before). Disk mode and MIDI
+  are unchanged.
+- Boot screen version: `op1r 19`.
+
 ## 2026-10-12 15:32 — op1r 18
 
 Output `ca667abb81f458f6039d9959383a0ecce56f34f8fb6e811392f0c787affb894a`
