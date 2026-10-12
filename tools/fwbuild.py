@@ -6,6 +6,8 @@
                [--text ADDR=TEXT ...] [--file PATH=LOCALFILE ...] [--sql DB=STATEMENT ...] [--ldr-out OP1_vdk.ldr]
 
   --op1r          start from the op1r patch (data/manifest.json) instead of the stock firmware
+  --base B.op1    start from another patched image B (e.g. someone's firmware built on op1r) instead; the
+                  positional firmware must still be the original R246 image
   --blob F@ADDR   load the raw binary F at ADDR (new LDR block inserted before the FINAL block)
   --call S=T      the 32-bit CALL at address S now calls T (S must already hold a CALL, unless --force)
   --jump S=T      write JUMP.L T at address S (e.g. at a function entry: S must hold a CALL/JUMP.L or a
@@ -70,6 +72,7 @@ def main():
     ap.add_argument('firmware')
     ap.add_argument('-o', '--output', required=True)
     ap.add_argument('--op1r', action='store_true')
+    ap.add_argument('--base', help='start from this already patched image instead of the original / op1r')
     ap.add_argument('--blob', action='append', default=[])
     ap.add_argument('--call', action='append', default=[])
     ap.add_argument('--jump', action='append', default=[])
@@ -86,7 +89,14 @@ def main():
     man = P.load_manifest()
     if P.sha256(op1) != man['original']['sha256']:
         raise SystemExit('input is not the original R246 image (sha256 mismatch)')
-    _, members = P.unpack(op1)
+    if a.base and a.op1r:
+        raise SystemExit('--base and --op1r exclude each other (a base built on op1r already contains it)')
+    if a.base:
+        base = open(a.base, 'rb').read()
+        print(f'base   {a.base} (sha256 {P.sha256(base)})')
+        _, members = P.unpack(base)
+    else:
+        _, members = P.unpack(op1)
     by_name = {m.name: i for i, (m, _) in enumerate(members)}
 
     if a.op1r:                                              # same steps as patch_op1.patch(), without repacking

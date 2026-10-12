@@ -53,8 +53,9 @@ extern int32_t     op1r_id_from_name(const void *s);
 extern const char *op1r_name_from_id(int32_t id);
 extern void       *op1r_build_screens(void);
 extern void        op1r_init_screens(void);
-extern void        op1r_key(int32_t key, int32_t pressed);
-extern void        op1r_encoder(int32_t enc, int16_t *delta);
+/* key / encoder: the next hook in the chain, op1r's unless the image is built on another patch (see fw.ld) */
+extern void        rp_next_key(int32_t key, int32_t pressed);
+extern void        rp_next_encoder(int32_t enc, int16_t *delta);
 
 #define HOST_ID      5
 #define HOST_SCREEN  0x2c
@@ -647,14 +648,14 @@ void rp_key(int32_t key, int32_t pressed) {
         roll_press(key - 0x3b);                         /* encoder presses: handle and swallow */
         return;
     }
-    op1r_key(key, pressed);
+    rp_next_key(key, pressed);
     roll_update_slot();
 }
 
 void rp_encoder(int32_t enc, int16_t *delta) {
     Roll *R;
     int n;
-    if (!roll_showing()) { op1r_encoder(enc, delta); return; }
+    if (!roll_showing()) { rp_next_encoder(enc, delta); return; }
     R = &roll[fw_mode == 1];
     n = (int) *delta / 1024;                            /* one detent = 0x400 */
     if (!n) return;

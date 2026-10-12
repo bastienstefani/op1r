@@ -64,6 +64,28 @@ Sur l'écran de l'effet (drive choisi comme effet du synthé, de la batterie ou 
 Limite connue (la même que pour les effets d'op1r) : en effet master, la liste affiche « filter » après un
 redémarrage, mais le son et les réglages restent ceux de drive.
 
+## Sur un autre firmware construit sur op1r
+
+`build.sh` peut partir d'une image publiée par quelqu'un d'autre, si elle est construite sur op1r 12, au lieu
+d'appliquer op1r lui-même :
+
+```sh
+examples/drive/build.sh op1_246.op1 op1r-249-drive.op1 op1_249.op1
+```
+
+Seules les images listées dans `build.sh` sont acceptées (vérifiées par leur sha256). Pour chacune, on a vérifié :
+
+- que son bloc de code op1r est celui d'op1r 12, octet pour octet ;
+- qu'elle ne modifie aucun des points que roll et drive détournent, sauf les touches et les encodeurs ;
+- que ses hooks touches / encodeurs rappellent ceux d'op1r : la chaîne devient drive → roll → l'image → op1r ;
+- quelle mémoire elle occupe : roll et drive sont chargés à `01ee0000`, au-dessus.
+
+Aucun octet de ces images n'est copié dans le dépôt : l'image sert d'entrée, comme le firmware d'origine.
+
+| Image | Construite sur | Ce qu'elle ajoute (d'après ses chaînes) | Mémoire | Démarrage |
+|---|---|---|---|---|
+| `op1_249.op1` (maikopruett.com, `b7adf5c0…`) | op1r 12 (`fc1ae37`) | undo / redo de la bande, quantification sur une gamme (`scale.cfg`), noms des snapshots, journaux dans `/log` | `01e40000-01eb7464`, `02800000-02980000` | `249+drv` |
+
 ## Revenir à op1r ou au firmware d'origine
 
 Un son qui utilise drive garde `"fx_type": "drive"`. Un firmware qui ne connaît pas drive (op1r seul, ou l'original)
@@ -93,7 +115,7 @@ chaque site avant de construire.
 | `dsp.h` | le cœur audio, en virgule fixe (modes, filtre à variable d'état suréchantillonné 2×, mix, niveau) |
 | `ui.h`, `screen.h` | l'écran : police vectorielle, mise en page, courbe, ondes, réglages |
 | `drive.c` | les hooks : nom, audio, écran, touches, encodeurs |
-| `drive.ld` | lien avec le piano roll à `01e80000`, adresses R246 et op1r 12 |
+| `drive.ld` | lien avec le piano roll à `01ee0000`, adresses R246 et op1r 12 |
 | `tables.h`, `gen_tables.py` | tables (sinus, drive, fréquence, niveau), générées |
 | `test_host.c` | test du DSP sur PC sous UBSan : toutes les combinaisons de réglages, pas de débordement |
 | `test_hooks.c` | test des hooks sur PC contre un firmware simulé |

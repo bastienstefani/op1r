@@ -12,7 +12,7 @@ X=${BFIN_PREFIX:-bfin-elf-}
 FWT="python3 $ROOT/tools/fwtool.py"
 B=$(mktemp -d)
 trap 'rm -rf "$B"' EXIT
-LOAD=0x01e80000
+LOAD=0x01ee0000
 
 # the op1r image we build on top of (apply the patch, then read the hook sites from it)
 $FWT unpack "$FW" "$B/orig" > /dev/null

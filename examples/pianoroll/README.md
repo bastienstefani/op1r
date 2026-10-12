@@ -98,6 +98,6 @@ dépend pas du système) et faire l'étape 1. En dernier recours, le « factory 
 | Fichier | Rôle |
 |---|---|
 | `roll.c` | le séquenceur : hooks d'intégration, lecteur (vtable 7 méthodes), écran (dessin par code), sauvegarde, calage sur le temps |
-| `fw.ld` | lien à `01e80000`, adresses du firmware R246 et des hooks op1r 12 |
+| `fw.ld` | lien à `01ee0000`, adresses du firmware R246 et des hooks op1r 12 |
 | `roll.svg` | écran presque vide (grille et notes dessinées par le code) |
 | `build.sh` | vérifie les cibles op1r et la remise à zéro d'horloge d'origine, compile, lie, puis `tools/fwbuild.py` (blob + hooks + ligne SQL + SVG) |

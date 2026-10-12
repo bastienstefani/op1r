@@ -1,9 +1,10 @@
-/* Link the piano roll into the free SDRAM window, above op1r's block (01e00000-~01e20000).
+/* Link the piano roll into the free SDRAM window, near its top: op1r's block is 01e00000-01e2a1d0, a patch built on
+ * op1r may use more above it (op1_249: 01e40000-01eb7464), te-boot uses 01f00000 and up.
  * Everything goes into one PROGBITS section so objcopy -O binary also emits the zeroed .bss. */
 ENTRY(_rp_build_screens)
 SECTIONS
 {
-    . = 0x01e80000;
+    . = 0x01ee0000;
     .blob : {
         *(.text .text.*)
         *(.rodata .rodata.*)
@@ -44,3 +45,8 @@ _op1r_build_screens = 0x01e00f0c;
 _op1r_init_screens  = 0x01e0121c;
 _op1r_key           = 0x01e01468;
 _op1r_encoder       = 0x01e01a80;
+
+/* the next key / encoder hook: op1r's, or the base image's own hooks (which chain to op1r's) when build.sh is
+ * given a base built on op1r (--defsym _base_key=... _base_encoder=...) */
+_rp_next_key     = DEFINED(_base_key)     ? _base_key     : _op1r_key;
+_rp_next_encoder = DEFINED(_base_encoder) ? _base_encoder : _op1r_encoder;

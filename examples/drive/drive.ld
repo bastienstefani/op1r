@@ -1,4 +1,4 @@
-/* Link drive together with the piano roll into one blob at 01e80000 (layout, R246 and op1r 12 symbols come
+/* Link drive together with the piano roll into one blob at 01ee0000 (layout, R246 and op1r 12 symbols come
  * from the piano roll's script; build.sh passes -L ../pianoroll). */
 INCLUDE fw.ld
 

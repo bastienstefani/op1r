@@ -14,9 +14,14 @@ Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (same 
   13 shaper modes, drive, pre/post state-variable filter (LP/BP/HP, resonance), mix, output level; screen with the
   transfer curve, the signal level on it, in/out waves and the four encoders. Not flash-tested.
 
+- `examples/drive/build.sh` takes an optional base image built on op1r 12 (only known ones, checked by sha256),
+  e.g. `op1_249.op1`: roll and drive are added on top of it and chained behind its key / encoder hooks. Nothing of
+  the base image is stored in the repository. `tools/fwbuild.py --base`.
+
 ### Changed
 - Both examples re-derived for op1r 12 (op1r's code block moved). `roll` is now `seq_types` id 9 (op1r 11 took 8
   for dots).
+- The examples' code moved from 01e80000 to 01ee0000 (op1_249 uses 01e40000-01eb7464).
 
 ## 2026-10-11 17:35 — op1r 12
 
