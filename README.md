@@ -127,6 +127,36 @@ Original firmware files (`*.op1`, `*.ldr`, unpacked trees) are git-ignored and m
 
 See [CHANGELOG.md](CHANGELOG.md) for what changed between versions.
 
+## Studying the original firmware
+
+[docs/firmware-r246.md](docs/firmware-r246.md) (in French) is a study of the original R246 firmware. It covers:
+
+- the image format, the Blackfin LDR blocks and the memory map;
+- the source tree, rebuilt from the assert strings;
+- the SQLite registry and how synth engines, FX, LFOs, sequencers, screens, input and MIDI work;
+- every edit op1r makes, and how to add features.
+
+Tools (Python 3 standard library):
+
+- `tools/analyze.sh` unpacks, disassembles and indexes the firmware into the git-ignored `work/`. It needs a
+  Blackfin objdump: `tools/build_bfin_toolchain.sh --binutils-only`.
+- `tools/fwtool.py` is a set of LDR, memory and cross-reference helpers.
+- `tools/fwbuild.py` is an experimental image builder. It adds code blocks, CALL/JUMP redirects, table edits,
+  files and SQL to the original image (or, with `--base`, to another patched image). With `--op1r` and no other
+  option, it rebuilds the reference image above byte for byte.
+- `tools/fwcheck.py` checks a built image before flashing: what it changes against a reference, LDR structure,
+  memory, databases, and the code a block calls into.
+- [`examples/midi-panic`](examples/midi-panic) is a small C hook built with `bfin-elf-gcc`: Shift + key sends
+  MIDI All Notes Off. It is not flash-tested.
+- [`examples/pianoroll`](examples/pianoroll) adds a piano-roll sequencer ("roll") on top of op1r: note editing,
+  polyphonic playback, saving, beat-aligned start. Flash-tested.
+- [`examples/drive`](examples/drive) adds a Serum-style distortion FX ("drive") on top of op1r and the piano roll:
+  13 shaper modes, pre/post filter, mix, level, with a transfer-curve screen. Flashed, first feedback good.
+  `examples/drive/build.sh` can also build both on top of a known third-party image built on op1r (op1_249).
+- `examples/run_tests.sh` runs the host tests of the examples (same C code, compiled for the PC).
+- [`docs/developpement.md`](docs/developpement.md) (French) is the guide for picking the work up: build and check
+  commands, memory map, hook chains, reserved ids, how to follow a new op1r version, known pitfalls.
+
 ## Maintainers: rebuilding the patch data
 
 The patch data is generated from a custom firmware tree built with the synth SDK (`make_firmware.py`,

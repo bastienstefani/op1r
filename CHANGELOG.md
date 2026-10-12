@@ -3,6 +3,43 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 — documentation and checks (patch output unchanged)
+
+Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (same as op1r 12)
+
+### Added
+- `docs/developpement.md`: guide for picking the work up (state, build/check commands, memory map, hook chains,
+  reserved ids, procedures for a new op1r version or a third-party base, pitfalls, known limits). `CLAUDE.md`.
+- `tools/fwcheck.py`: offline checks of a built image (diff against a reference, LDR structure, overlaps, memory,
+  databases; outgoing calls and addresses used by a code block; block hash).
+- `examples/run_tests.sh` runs every host test; `pianoroll/test_beat.c` (beat-aligned start, now in `beat.h`),
+  `drive/test_ui.c` + `render_ui.py` (screen preview).
+- `docs/firmware-r246.md`: hosting an FX on top of op1r, preset browsers, sequencer clock and player vtable, heap,
+  memory map for op1r 12 and op1_249.
+
+### Changed
+- Example READMEs: status per feature, wiring, internals. Built images are byte-identical to the previous push.
+
+## 2026-10-11 — examples rebuilt on op1r 12 (patch output unchanged)
+
+Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c` (same as op1r 12)
+
+### Added
+- `examples/pianoroll`: saving; orange press = play / hold with a HOLD box; playback starts on the next beat of the
+  sequencer clock.
+- `examples/drive`: a Serum-style distortion FX ("drive") on top of op1r and the piano roll, one image with both.
+  13 shaper modes, drive, pre/post state-variable filter (LP/BP/HP, resonance), mix, output level; screen with the
+  transfer curve, the signal level on it, in/out waves and the four encoders. Not flash-tested.
+
+- `examples/drive/build.sh` takes an optional base image built on op1r 12 (only known ones, checked by sha256),
+  e.g. `op1_249.op1`: roll and drive are added on top of it and chained behind its key / encoder hooks. Nothing of
+  the base image is stored in the repository. `tools/fwbuild.py --base`.
+
+### Changed
+- Both examples re-derived for op1r 12 (op1r's code block moved). `roll` is now `seq_types` id 9 (op1r 11 took 8
+  for dots).
+- The examples' code moved from 01e80000 to 01ee0000 (op1_249 uses 01e40000-01eb7464).
+
 ## 2026-10-11 17:35 — op1r 12
 
 Output `d294dcb3f419848cec66b57bc7f587ea86fd40e03ddd4fe726492804d6a28f2c`
@@ -103,6 +140,18 @@ Output `1acdf3f18d1d2ea5e169b6428530ffec0dd8348844e3e0e934f0ec2b81a95bc1`
 
 ### Changed
 - Boot screen version: `op1r 6`.
+
+## 2026-10-10 — study tools (patch output unchanged)
+
+Output `d4daaea0b7af55f58be545008346f8f54a11abd652945721084b0a6876ab717d` (same as op1r 5)
+
+### Added
+- `docs/firmware-r246.md`: study of the original R246 firmware and of every op1r edit (in French).
+- `tools/`: `analyze.sh`, `fwtool.py` (LDR/memory/xref helpers), `fwbuild.py` (experimental image builder),
+  `build_bfin_toolchain.sh` (binutils + GCC for bfin-elf).
+- `examples/midi-panic`: C hook example (Shift + key → MIDI All Notes Off), not flash-tested.
+- `examples/pianoroll`: a piano-roll sequencer built on top of op1r (new 'roll' entry, grid screen, polyphonic
+  playback, note editing); a study example, developed against op1r 5.
 
 ## 2026-10-10 18:44 — op1r 5
 

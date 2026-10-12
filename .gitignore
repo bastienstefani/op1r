@@ -7,6 +7,12 @@ op1_246*/
 op1_*/
 content/
 
+# disassembly listings written next to the images by the examples' build.sh
+*.dis
+
 # Python
 __pycache__/
 *.pyc
+
+# analysis work directory (tools/analyze.sh): firmware files, disassembly
+work/
