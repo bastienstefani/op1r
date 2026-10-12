@@ -73,6 +73,10 @@ with:
     length, **Shift + green** extends to the next full row and copies the row above
   - per-trigger parameters (white; press white to choose the parameter): gate (or tie), ratchet 1–8, chance,
     condition (play in loop a of b), nudge (±1/2 step), ratchet level ramp
+  - **FX parameter locks**: FX1–FX4 in the same list set knob 1–4 (blue … red) of the instrument's FX for that
+    step (`--` = off, the default, or 0–100 %); the knob returns to its own setting after the step's gate (TIE: at the
+    slot's next trigger). **Press blue** while recording to put a **lock trigger** (no note, hollow square) on an
+    empty step, again to remove it; a key on it adds a note
   - mutes (**Shift + G A B C D E**, D# all), 4 patterns (**Shift + F G A B**), lift / drop / scissors copy / paste /
     cut the slot (Shift: whole pattern), all saved
 - **MIDI sync** (tempo sync = MIDI in): on MIDI START the stock pattern sequencer, dots and euclid restart so their
@@ -127,7 +131,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `118e6fe845d4d66cb400d7d65da76438a739d4a2031f8efc3ddb48a7423a6be1` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `ca667abb81f458f6039d9959383a0ecce56f34f8fb6e811392f0c787affb894a` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

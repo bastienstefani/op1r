@@ -3,6 +3,24 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 15:32 — op1r 18
+
+Output `ca667abb81f458f6039d9959383a0ecce56f34f8fb6e811392f0c787affb894a`
+
+### Added
+- dots: **FX parameter locks.** Each trigger can set the instrument FX knobs 1–4 (FX1–FX4 in the white parameter
+  list, `--` = off by default, 0–100 %); the knob returns to its own setting after the step's gate (TIE: at the slot's
+  next trigger). Requested by a user.
+- dots: **lock triggers** without a note: press blue while recording on an empty step (hollow square), again to
+  remove it; a note key on it adds a note and keeps the locks.
+
+### Fixed
+- A synth patch whose type is unknown (a custom engine no longer in the firmware) locked the OP-1 with
+  "patch.cpp:390 Invalid synth patch … error 1"; it now loads as the stock iter synth.
+
+### Changed
+- Boot screen version: `op1r 18`.
+
 ## 2026-10-12 14:17 — op1r 17
 
 Output `118e6fe845d4d66cb400d7d65da76438a739d4a2031f8efc3ddb48a7423a6be1`
