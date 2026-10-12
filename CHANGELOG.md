@@ -3,6 +3,21 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 23:34 — op1r 22
+
+Output `5b20c4e874597b68f9b4d67ecceab8546e4746b468173bb621909aeb1a0db559`
+
+### Added
+- **Count-in before recording**: REC held + metronome (tape stopped) counts 4 / 8 / 16 beats with the stock
+  metronome click, then starts recording on the next beat, hands-free until STOP. STOP or REC + metronome again
+  cancels. Uses a fixed audible level if the metronome level is 0. Requested by users.
+- **Settings page** on the clock / card screen, **T3**: COUNT-IN 4 / 8 / 16 (blue), saved.
+
+### Changed
+- **Metronome accent**: beat 1 of each 4/4 bar is an octave higher, also for the normal metronome. Bars follow the
+  tape position (from the tape start, or from where a count-in recording started).
+- Boot screen version: `op1r 22`.
+
 ## 2026-10-12 22:35 — op1r 21
 
 Output `359e5d022882a5673efca2c957f32241bc9b997b2a573f58caeaba835e2bbf66`

@@ -51,6 +51,11 @@ with:
     pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
+- **count-in**: with the tape stopped, hold **REC** and press **metronome**: 4 / 8 / 16 metronome clicks, then
+  recording starts on the next beat and runs until STOP (REC can be released). STOP or REC + metronome again cancels.
+  Audible even with the metronome level at 0. The number of beats is set on the settings page: clock / card + **T3**
+- **metronome accent**: beat 1 of each 4/4 bar clicks an octave higher (bars follow the tape; after a count-in
+  they start where the recording started)
 - **Oblique Strategies cards**: **Shift + help** shows a random card from Brian Eno and Peter Schmidt's *Oblique
   Strategies* in the clock's place; Shift + help again shows the clock, again a new card (the last view is
   remembered). T1 / T2 (monitor, USB out) work from both. Idea and card list from
@@ -149,7 +154,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `359e5d022882a5673efca2c957f32241bc9b997b2a573f58caeaba835e2bbf66` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `5b20c4e874597b68f9b4d67ecceab8546e4746b468173bb621909aeb1a0db559` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
