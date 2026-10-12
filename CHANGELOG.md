@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 22:35 — op1r 21
+
+Output `359e5d022882a5673efca2c957f32241bc9b997b2a573f58caeaba835e2bbf66`
+
+### Added
+- **Oblique Strategies cards** on Shift + help: a random card (never the same twice in a row) in the clock's place;
+  Shift + help toggles card / clock, the last view is remembered; T1 / T2 still open the monitor / USB out page.
+  Text in the OP-1 font; `' ( ) [ ]`, which the font lacks, are drawn separately. Idea and cards from
+  ultralazr/op1-oblique-strategies (MIT; card texts by Brian Eno and Peter Schmidt).
+
+### Changed
+- Shift + help in clock mode switches between card and clock (stock: did nothing).
+- Boot screen version: `op1r 21`.
+
 ## 2026-10-12 21:55 — op1r 20
 
 Output `a5a719e8e8de936f9191628c2f9765c5b3a7f54772044e3778dfb8f780345be3`

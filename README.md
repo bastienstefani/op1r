@@ -51,6 +51,11 @@ with:
     pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
+- **Oblique Strategies cards**: **Shift + help** shows a random card from Brian Eno and Peter Schmidt's *Oblique
+  Strategies* in the clock's place; Shift + help again shows the clock, again a new card (the last view is
+  remembered). T1 / T2 (monitor, USB out) work from both. Idea and card list from
+  [ultralazr/op1-oblique-strategies](https://github.com/ultralazr/op1-oblique-strategies) (code MIT, Martin
+  Mairinger; the card texts are Eno / Schmidt's and not covered by that licence)
 - **resource monitor**: on the clock screen (**Shift + help**) press **T1** to switch to a page with CPU load,
   audio processing load (both with a peak marker), RAM and disk usage and the MIDI in / out buffer fill; T1 again
   goes back to the clock
@@ -144,7 +149,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `a5a719e8e8de936f9191628c2f9765c5b3a7f54772044e3778dfb8f780345be3` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `359e5d022882a5673efca2c957f32241bc9b997b2a573f58caeaba835e2bbf66` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
