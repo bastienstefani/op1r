@@ -3,6 +3,19 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 21:55 — op1r 20
+
+Output `a5a719e8e8de936f9191628c2f9765c5b3a7f54772044e3778dfb8f780345be3`
+
+### Added
+- **Tape markers**: tape screen, red press sets a marker at the cursor, Shift + red press removes the one under the
+  cursor, Shift + red turn jumps to the next / previous marker (wraps, also while playing). Up to 32, green ticks
+  above the tracks that scroll and zoom with the tape, saved. Plain red still sets the record level.
+
+### Changed
+- Shift + red on the tape screen no longer changes the record level (it jumps between markers).
+- Boot screen version: `op1r 20`.
+
 ## 2026-10-12 20:59 — op1r 19
 
 Output `dbbf0a66c16903681dc2851b5444a69bd22a65bf92842baa9449cf6459a754e1`

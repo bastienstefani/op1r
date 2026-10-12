@@ -59,6 +59,9 @@ with:
   knob switches between **MASTER** (track channels silent, saves 5–7 % CPU; default) and **MASTER + TRACKS**; the
   setting is saved. Tested on Linux and macOS (Windows untested: if the OP-1 still shows 2 channels, remove the old
   OP-1 device entry once)
+- **tape markers**: on the tape screen, press **red** to set a marker at the cursor, **Shift + red** press removes the
+  marker under the cursor, **Shift + red** turn jumps to the next / previous marker (wraps around; works while
+  playing). Up to 32 markers, shown as green ticks above the tracks, saved
 - **MIDI CC control** (USB MIDI, on the OP-1's MIDI channel):
   - keys: CC = key code + 5 as in the OP-1's own CTRL mode, value ≥ 64 press / < 64 release: 5 help, 6 metronome,
     7–10 synth/drum/tape/mixer, 11–14 T1–T4, 15–17 lift/drop/scissors, 21–25 and 50–52 the keys 1–8,
@@ -141,7 +144,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `dbbf0a66c16903681dc2851b5444a69bd22a65bf92842baa9449cf6459a754e1` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `a5a719e8e8de936f9191628c2f9765c5b3a7f54772044e3778dfb8f780345be3` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
