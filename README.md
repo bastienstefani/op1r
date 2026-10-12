@@ -71,6 +71,9 @@ with:
     condition (play in loop a of b), nudge (±1/2 step), ratchet level ramp
   - mutes (**Shift + G A B C D E**, D# all), 4 patterns (**Shift + F G A B**), lift / drop / scissors copy / paste /
     cut the slot (Shift: whole pattern), all saved
+- **MIDI sync** (tempo sync = MIDI in): on MIDI START the stock pattern sequencer, dots and euclid restart so their
+  first step falls on the master's downbeat, also right after a pause; notes then follow the external clock within
+  about 1 ms
 - hidden **OP-Z controller mode** in COM → CTRL, switched on by the SysEx `F0 00 20 76 00 01 03 F7`
   from the host (any MIDI tool that can send SysEx; `F0 00 20 76 00 01 00 F7` switches it off)
 
@@ -120,7 +123,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `297cac31ab66780fcb5f9e30c3772247b5cdba100d1b7da8b6d8831845eeb1a1` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `b356970c524a00997b99529f56c4fd2c98370b554c2947dc3a2ba3fee9e2e81a` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

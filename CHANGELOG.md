@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 10:40 — op1r 15
+
+Output `b356970c524a00997b99529f56c4fd2c98370b554c2947dc3a2ba3fee9e2e81a`
+
+### Fixed
+- **MIDI sync to an external sequencer** (user report). With tempo sync = MIDI in, the OP-1's sequencers ignored MIDI
+  START: a running pattern kept its own position, so the OP-1 played up to 3 clocks (≈ 60 ms at 120 bpm) early or
+  late, different on every start. Now MIDI START restarts the stock pattern sequencer, dots and euclid so their first
+  step falls on the master's first clock, also after a pause (when the OP-1 had fallen back to its internal tempo).
+  Measured at 60 / 120 / 200 bpm: every note 1.0 ± 0.4 ms after the master's grid. Other stock sequencers (endless,
+  arpeggio, finger, sketch, tombola) are unchanged.
+- dots / euclid: steps fired one tick early (1/96 beat with the internal tempo, almost a clock with an external clock).
+
+### Changed
+- Boot screen version: `op1r 15`.
+
 ## 2026-10-11 22:45 — op1r 14
 
 Output `297cac31ab66780fcb5f9e30c3772247b5cdba100d1b7da8b6d8831845eeb1a1`
