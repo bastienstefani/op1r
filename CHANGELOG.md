@@ -3,6 +3,19 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-12 11:23 — op1r 16
+
+Output `7d49979e0e01927281898b9a0fcc49d09633650cb427b1bf15961113a77e67df`
+
+### Added
+- quad LFO: **LFOs as targets.** White now also reaches LFO 1–4's frequency (F, ±2 octaves), amount (A, ×0…2) and
+  phase offset (O, ±½ cycle); an LFO can modulate itself. Several LFOs on one target add up.
+
+### Changed
+- quad LFO: new saved format. **Quad LFOs saved with op1r 15 or earlier load silent** (all four LFOs at defaults,
+  amount 0) and have to be set up again; the first edit converts them.
+- Boot screen version: `op1r 16`.
+
 ## 2026-10-12 10:40 — op1r 15
 
 Output `b356970c524a00997b99529f56c4fd2c98370b554c2947dc3a2ba3fee9e2e81a`

@@ -26,7 +26,8 @@ with:
     red fades in the fire
 - **quad** LFO: four LFOs in one slot, one row each: live output, frequency, amount, target and type
   - blue frequency (0.05–20 Hz) or tempo division, green amount (±100 %), white target (synth / drum engine knob,
-    envelope A D S R or FX knob, shown as a symbol plus a dot in the knob colour), red type
+    envelope A D S R, FX knob, or another LFO's frequency / amount / phase offset (F / A / O, self included), shown as a
+    symbol plus a dot in the knob / LFO colour), red type
   - types: **VOIC** (per voice), **FREE** (free-running), **GATE** (restarts at note-on), **MONO** (restarts at every
     note-on, shared), **SHOT** (one cycle after note-on, then holds), **RAND** (new random value per note)
   - press an encoder to select LFO 1–4
@@ -123,7 +124,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `b356970c524a00997b99529f56c4fd2c98370b554c2947dc3a2ba3fee9e2e81a` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `7d49979e0e01927281898b9a0fcc49d09633650cb427b1bf15961113a77e67df` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
