@@ -102,6 +102,11 @@ Rendered on the PC from the same screen code that runs on the OP-1 (host harness
 | LFO | Sequencer |
 |---|---|
 | ![quad LFO](docs/images/lfo_quad.png) **quad** LFO | ![euclid](docs/images/seq_euclid.png) **euclid** sequencer |
+| ![dots](docs/images/seq_dots.png) **dots** sequencer (record mode: notes, lock triggers as hollow squares, a note with an FX lock) | |
+
+| Resource monitor | |
+|---|---|
+| ![resource monitor](docs/images/sysmon.png) clock screen + **T1** (text in the OP-1 font on the device) | |
 
 The repository contains no Teenage Engineering firmware. You provide the original update file, and the
 patcher applies only the differences stored in `data/`. These are our code, our screen SVGs and small
