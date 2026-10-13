@@ -184,3 +184,14 @@ It then runs the patcher once. It writes the reference image (`<custom tree>-pat
 `--reference <file>`) and its checksums to `data/manifest.json`, and checks that the reference unpacks to exactly the custom tree.
 Flash-test the reference image before publishing a new patch, and commit `data/` together with the
 updated output checksum in this README.
+
+## License
+
+op1r is free software under the **GNU General Public License v3.0 or later** ([LICENSE](LICENSE)), with an
+additional permission to combine it with the OP-1 firmware ([NOTICE](NOTICE)). In short: use it, modify it and
+patch your own firmware freely; if you **distribute** op1r or anything built on it (a modified patcher, another
+firmware mod, a product containing this code), you must release its complete source under the same license.
+
+Not covered: the Teenage Engineering firmware (never included here) and the Oblique Strategies card texts (Brian Eno
+and Peter Schmidt). Third-party parts (MIT): Mutable Instruments Clouds / Elements reverb ports (Emilie Gillet),
+op1repacker's iter-lab.svg and LZMA settings (op1hacks), svgfont.py (Martin Mairinger). Details in [NOTICE](NOTICE).
