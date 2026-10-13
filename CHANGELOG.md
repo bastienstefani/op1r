@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-13 14:09 — op1r 25
+
+Output `12922293a255cb6952605149d24b7fd8d09b19ecc2177984b02d79405e45c79e`
+
+### Added
+- **Drum sample editor** (drum + scissors on the drum page): edits the last played pad's region (exact to the
+  sample), zooms to it when a key is pressed; `fit` (trim the pad's silence), zero / normalize / reverse / DC / fade,
+  copy, cut (zeroes), paste (overwrites).
+- **Auto-cut** of a drum sample into pads (Shift + T3): the first 24 hits or 24 equal slices, preview, sensitivity on
+  blue, undo with Shift + left.
+- **Play position** line in the sample editors.
+
+### Changed
+- Transient detection stricter (fewer hits inside one sound).
+- Boot screen version: `op1r 25`.
+
 ## 2026-10-13 13:19 — op1r 24
 
 Output `9f73dec61fae7fb0c156ad7f0dbf2a10284fedc1e291e60544b6c5f6d5c6470f`

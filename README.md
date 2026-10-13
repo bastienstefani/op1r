@@ -61,6 +61,10 @@ with:
   off. T1 trim (Shift: DC offset), T2 zero (Shift: fade mode: in / out / both, linear / power, length on blue),
   T3 normalize, T4 reverse; Shift + left undoes a trim. Lift / scissors / drop copy, cut and paste the selection
   (paste also onto the tape or another sampler slot). Shift shows the alternate key labels. Closing saves
+- **drum sample editor**: on the drum page hold **drum** and press **scissors**: the same editor for the pad played
+  last (exact to the sample; pressing a key selects and shows its pad). T1 `fit` trims the pad's silence, Shift + T3
+  `auto` cuts the kit into pads (first 24 hits, or 24 equal slices; preview, sensitivity on blue, Shift + left undoes).
+  Cut zeroes, drop overwrites. A red line shows the play position (also in the synth editor)
 - **count-in**: with the tape stopped, hold **REC** and press **metronome**: 4 / 8 / 16 metronome clicks, then
   recording starts on the next beat and runs until STOP (REC can be released). STOP or REC + metronome again cancels.
   Audible even with the metronome level at 0. The number of beats is set on the settings page: clock / card + **T3**
@@ -164,7 +168,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `9f73dec61fae7fb0c156ad7f0dbf2a10284fedc1e291e60544b6c5f6d5c6470f` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `12922293a255cb6952605149d24b7fd8d09b19ecc2177984b02d79405e45c79e` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**
