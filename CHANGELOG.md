@@ -3,6 +3,19 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-13 14:31 — op1r 26
+
+Output `60475eac4079ac1b07ea174ad87c8aeabed0bd3e72c56229df053d9a2a60ea4c`
+
+### Fixed
+- **Crash when the dots sequencer saves** (reported: Shift + white on dots, exception screen, op1r 18–25): when the
+  database rejected the save, the firmware's error report copied the whole ~7 KB statement into a small stack buffer
+  and crashed. Long saves (dots, euclid, tape markers) now go to sqlite directly and an error is just returned.
+  If a save fails, the resource monitor (clock + T1) shows `db err N` (please include N in a report).
+
+### Changed
+- Boot screen version: `op1r 26`.
+
 ## 2026-10-13 14:09 — op1r 25
 
 Output `12922293a255cb6952605149d24b7fd8d09b19ecc2177984b02d79405e45c79e`
