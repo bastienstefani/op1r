@@ -21,9 +21,9 @@ with:
     flutter, age)
   - **clouds**: granular texture FX, a port of Mutable Instruments Clouds (position, size, pitch, density;
     encoder presses switch to a second page, red press freezes)
-  - **reverb**: lush plate/hall reverb, a port of the Mutable Instruments Elements reverb (time, mix, diffusion,
-    tone); its own screen (Kali: graphics by DAN76): blue shows 1–6 arms, green lights the mix scale, white brightens the skulls,
-    red fades in the fire
+  - **reverb**: lush plate/hall reverb, a port of the Mutable Instruments Elements reverb (time, tone, diffusion,
+    mix); its own screen (Kali: graphics by DAN76): blue shows 1–6 arms, green fades in the fire (tone), white brightens the skulls,
+    red lights the mix scale
 - **quad** LFO: four LFOs in one slot, one row each: live output, frequency, amount, target and type
   - blue frequency (0.05–20 Hz) or tempo division, green amount (±100 %), white target (synth / drum engine knob,
     envelope A D S R, FX knob, or another LFO's frequency / amount / phase offset (F / A / O), shown as a
@@ -55,6 +55,12 @@ with:
   the record circle). While playing, forward or in reverse, the next marker starts recording, the one after stops
   it, then punch mode turns off. PLAY while punched in: 1st press ends punch mode (recording continues), 2nd press
   stops recording. STOP stops; armed and stopped, STOP disarms. Tape + REC again cancels
+- **sample editor** (synth sampler): on the sampler page hold **synth** and press **scissors**. Blue / green move
+  start / end (the sampler's own markers, so keys play the range at once), white zooms (Shift: move the selection),
+  red scrolls (Shift: attenuate the whole sample, applied on close), red press snaps to zero crossings / transients /
+  off. T1 trim (Shift: DC offset), T2 zero (Shift: fade mode: in / out / both, linear / power, length on blue),
+  T3 normalize, T4 reverse; Shift + left undoes a trim. Lift / scissors / drop copy, cut and paste the selection
+  (paste also onto the tape or another sampler slot). Shift shows the alternate key labels. Closing saves
 - **count-in**: with the tape stopped, hold **REC** and press **metronome**: 4 / 8 / 16 metronome clicks, then
   recording starts on the next beat and runs until STOP (REC can be released). STOP or REC + metronome again cancels.
   Audible even with the metronome level at 0. The number of beats is set on the settings page: clock / card + **T3**
@@ -158,7 +164,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `d98805a53404ac7fe77ed23117028db133ac78a76ad50fddbc850cfd9d81ccae` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `9f73dec61fae7fb0c156ad7f0dbf2a10284fedc1e291e60544b6c5f6d5c6470f` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

@@ -3,6 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-13 13:19 — op1r 24
+
+Output `9f73dec61fae7fb0c156ad7f0dbf2a10284fedc1e291e60544b6c5f6d5c6470f`
+
+### Added
+- **Sample editor** for the synth sampler (synth + scissors on the sampler page): start / end markers, zoom,
+  scroll, zero-crossing and transient snap, trim (with undo and de-click fades), zero, normalize, reverse, DC offset,
+  fades (in / out / both, linear / equal power), attenuation of the whole sample, copy / cut / paste of the
+  selection through the stock clipboard (to the tape, a sampler slot or back into the editor). Key labels above
+  T1–T4 in the stock font, Shift shows the alternate ones.
+
+### Changed
+- **Kali reverb**: green and red swapped: green = tone, red = mix; tone dial green, mix scale and title red.
+  Reverbs saved before this version load with mix and tone exchanged.
+- Boot screen version: `op1r 24`.
+
 ## 2026-10-13 07:03 — op1r 23
 
 Output `d98805a53404ac7fe77ed23117028db133ac78a76ad50fddbc850cfd9d81ccae`
