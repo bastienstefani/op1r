@@ -3,7 +3,22 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
-## Unreleased (patcher only, firmware unchanged)
+## 2026-10-13 16:02 — op1r 27
+
+Output `bc3249bc56fd64ddb1a635e551a85595250781bee6b7eef563e2732e5645c07f`
+
+### Fixed
+- **Saves failing with "out of memory"** (dots, euclid, and the stock sequencer saves with many user presets): the
+  firmware's database cache grew until its fixed memory was full, and from then on every save failed (with dots:
+  the crash reported for op1r 18–25). The cache is now capped when the databases open. Analysis and fix by a user,
+  thank you.
+- Correction to op1r 26: its crash explanation (stack overwritten) was wrong; the crash came from the firmware's
+  error report walking our code's stack frames. op1r 26's change still prevents it.
+
+### Changed
+- The firmware code block is smaller and ends below 0x01E40000 (its zeroed variables moved to a separate area), so
+  it can coexist with other projects' modules loaded there.
+- Boot screen version: `op1r 27`.
 
 ### Added
 - **Source code published:** [op1r-src](https://github.com/pcppcp/op1r-src) (GPL-3.0-or-later), including
