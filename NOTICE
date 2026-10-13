@@ -8,6 +8,7 @@ version. It is distributed WITHOUT ANY WARRANTY; see the GNU General Public Lice
 Covered: our source code, our graphics (SVG) and our compiled code, including the code contained in the patch data
 (data/). Anyone who distributes this program or a work based on it (modified patchers, other firmware mods or
 products containing this code) must do so under the GPL and provide the complete corresponding source.
+The source code is published at https://github.com/pcppcp/op1r-src.
 
 ADDITIONAL PERMISSION (GPL-3.0 section 7)
 As an additional permission, you may combine this program, or a work based on it, with the Teenage Engineering OP-1

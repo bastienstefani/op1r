@@ -212,6 +212,10 @@ additional permission to combine it with the OP-1 firmware ([NOTICE](NOTICE)). I
 patch your own firmware freely; if you **distribute** op1r or anything built on it (a modified patcher, another
 firmware mod, a product containing this code), you must release its complete source under the same license.
 
+**Source code:** [op1r-src](https://github.com/pcppcp/op1r-src): the firmware code, the synth SDK, and how to write
+your own synth / effect plugin ([PLUGINS.md](https://github.com/pcppcp/op1r-src/blob/main/synth_sdk/PLUGINS.md)).
+Releases from op1r 27 on are built from it.
+
 Not covered: the Teenage Engineering firmware (never included here) and the Oblique Strategies card texts (Brian Eno
 and Peter Schmidt). Third-party parts (MIT): Mutable Instruments Clouds / Elements reverb ports (Emilie Gillet),
 op1repacker's iter-lab.svg and LZMA settings (op1hacks), svgfont.py (Martin Mairinger). Details in [NOTICE](NOTICE).

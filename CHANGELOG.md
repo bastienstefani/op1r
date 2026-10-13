@@ -6,6 +6,8 @@ Newest first. Each entry lists the changes since the previous push and the outpu
 ## Unreleased (patcher only, firmware unchanged)
 
 ### Added
+- **Source code published:** [op1r-src](https://github.com/pcppcp/op1r-src) (GPL-3.0-or-later), including
+  the synth SDK and a guide for writing your own synth / effect plugins.
 - **Choose your synths and FX**: `patch_op1.py --without clouds,granular` (or unticking them in the web patcher)
   hides custom synths / FX from the OP-1's selection lists. Their code stays in, so presets that use them still
   work. `--info` lists the names.
