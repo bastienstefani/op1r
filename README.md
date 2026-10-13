@@ -51,6 +51,10 @@ with:
     pattern
   - runs at the OP-1 tempo, plays polyphonically and sends MIDI; slot settings and mutes are saved (slots come
     back stopped)
+- **punch in / out at markers**: hold **tape** and press **REC** to arm punch mode (markers turn red, `[o]` around
+  the record circle). While playing, forward or in reverse, the next marker starts recording, the one after stops
+  it, then punch mode turns off. PLAY while punched in: 1st press ends punch mode (recording continues), 2nd press
+  stops recording. STOP stops; armed and stopped, STOP disarms. Tape + REC again cancels
 - **count-in**: with the tape stopped, hold **REC** and press **metronome**: 4 / 8 / 16 metronome clicks, then
   recording starts on the next beat and runs until STOP (REC can be released). STOP or REC + metronome again cancels.
   Audible even with the metronome level at 0. The number of beats is set on the settings page: clock / card + **T3**
@@ -154,7 +158,7 @@ version. The firmware content is still verified identical, and `--accept-recompr
 | | SHA-256 |
 |---|---|
 | input `op1_246.op1` (original R246) | `c5315218f825f143b415ca554516541898abee843d3a236df0b54c04e1fb13a9` |
-| output (reference build) | `5b20c4e874597b68f9b4d67ecceab8546e4746b468173bb621909aeb1a0db559` (also `python3 patch_op1.py --info`) |
+| output (reference build) | `d98805a53404ac7fe77ed23117028db133ac78a76ad50fddbc850cfd9d81ccae` (also `python3 patch_op1.py --info`) |
 
 Install the result like any OP-1 update (bootloader update mode). The bootloader is not modified, so the
 original `op1_246.op1` can always be flashed back. **Use at your own risk.**

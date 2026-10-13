@@ -3,6 +3,20 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## 2026-10-13 07:03 — op1r 23
+
+Output `d98805a53404ac7fe77ed23117028db133ac78a76ad50fddbc850cfd9d81ccae`
+
+### Added
+- **Punch in / out at markers**: tape held + REC arms punch mode (red markers, `[o]` around the record circle). The
+  next marker in the travel direction (forward or reverse, also across the loop wrap) punches in, the next one
+  punches out, then punch mode turns off. PLAY while punched in: 1st press ends punch mode (still recording), 2nd
+  press stops recording; STOP stops; STOP while armed and stopped disarms; tape + REC again cancels.
+- **License**: GPL-3.0-or-later with an additional permission to combine with the OP-1 firmware (LICENSE, NOTICE).
+
+### Changed
+- Boot screen version: `op1r 23`.
+
 ## 2026-10-12 23:34 — op1r 22
 
 Output `5b20c4e874597b68f9b4d67ecceab8546e4746b468173bb621909aeb1a0db559`
