@@ -592,6 +592,18 @@
    "template": "content/display/adsr.svg"
   }
  ],
+ "plugins": {
+  "synth": [
+   "supersaw",
+   "fmbell",
+   "granular"
+  ],
+  "fx": [
+   "tape",
+   "clouds",
+   "reverb"
+  ]
+ },
  "result": {
   "tar_sha256": "dbd8ecb2224c275c68430cbcbbc8a590e29096663b11278197252b1855a624fd",
   "sha256": "60475eac4079ac1b07ea174ad87c8aeabed0bd3e72c56229df053d9a2a60ea4c",

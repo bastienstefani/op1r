@@ -10,6 +10,7 @@ async function setup() {
   say('log', { text: 'loading Python (first time ~10 MB, then cached) ...' });
   const py = await loadPyodide({ indexURL: PYODIDE });
   await py.loadPackage('lzma').catch(() => {});   // separate package in older Pyodide, built in since 314
+  await py.loadPackage('sqlite3');                  // unvendored stdlib module: needed to hide synths / FX
   const get = async (p) => {
     const r = await fetch('../' + p, { cache: 'no-cache' });
     if (!r.ok) throw new Error(`cannot load ${p} (${r.status})`);
@@ -32,7 +33,8 @@ onmessage = async (e) => {
   try {
     ready = ready || setup();
     const py = await ready;
-    py.FS.writeFile('/in.op1', new Uint8Array(e.data));
+    py.FS.writeFile('/in.op1', new Uint8Array(e.data.op1));
+    py.globals.set('WITHOUT', py.toPy(e.data.without));
     py.globals.set('log', (t) => say('log', { text: t }));
     // fail() in patch_op1.py calls sys.exit('ERROR: ...') -> SystemExit, reported below
     const res = py.runPython(`
@@ -42,13 +44,13 @@ if h != MAN['original']['sha256']:
     raise SystemExit('This is not the original OP-1 firmware ' + MAN['original']['name'] +
                      ' (sha256 ' + h[:16] + '...). Download it from teenage.engineering and try again.')
 log('input OK: ' + MAN['original']['name'])
-out, _ = P.patch(op1, MAN, log=log)
+out, _ = P.patch(op1, MAN, log=log, without=list(WITHOUT))
 open('/out.op1', 'wb').write(out)
 h = P.sha256(out)
 (h, h == MAN['result']['sha256'])
 `).toJs();
     const out = py.FS.readFile('/out.op1');
-    say('done', { out, sha: res[0], exact: res[1] }, [out.buffer]);
+    say('done', { out, sha: res[0], exact: res[1], hidden: e.data.without }, [out.buffer]);
   } catch (err) {
     const m = String(err.message || err).match(/SystemExit: (.*)/s);
     say('error', { text: m ? m[1].trim() : String(err) });

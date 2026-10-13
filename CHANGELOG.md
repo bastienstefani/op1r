@@ -3,6 +3,13 @@
 Newest first. Each entry lists the changes since the previous push and the output checksum of
 `patch_op1.py` for that version. The input is always the original R246 image.
 
+## Unreleased (patcher only, firmware unchanged)
+
+### Added
+- **Choose your synths and FX**: `patch_op1.py --without clouds,granular` (or unticking them in the web patcher)
+  hides custom synths / FX from the OP-1's selection lists. Their code stays in, so presets that use them still
+  work. `--info` lists the names.
+
 ## 2026-10-13 14:31 — op1r 26
 
 Output `60475eac4079ac1b07ea174ad87c8aeabed0bd3e72c56229df053d9a2a60ea4c`

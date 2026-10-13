@@ -153,7 +153,13 @@ git clone https://github.com/pcppcp/op1r.git && cd op1r
 python3 patch_op1.py /path/to/op1_246.op1            # -> /path/to/op1_246-custom.op1
 python3 patch_op1.py /path/to/op1_246.op1 -o op1-custom.op1
 python3 patch_op1.py --info                          # what the patch contains + checksums
+python3 patch_op1.py /path/to/op1_246.op1 --without clouds,granular   # hide synths / FX you don't want
 ```
+
+**Choosing synths and FX:** `--without` (or unticking them in the web patcher) hides custom synths / FX from the
+OP-1's selection lists. Their code stays in the firmware, so presets that already use them still load and play.
+`--info` lists the names. The result is then not the reference build: every file is verified first, and only the
+selection lists change afterwards, so its checksum differs from the one below.
 
 The patcher:
 1. Checks the input SHA-256 against the original R246 image and refuses anything else.

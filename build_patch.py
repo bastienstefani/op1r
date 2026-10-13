@@ -63,6 +63,16 @@ def file_ops(name, a, b, blobdir):
     return ops
 
 
+def plugin_rows(custom):
+    """custom synths / FX = DB rows whose default_params[4] is the plugin selector 0x5300 + n (hideable)"""
+    import sqlite3
+    c = sqlite3.connect(os.path.join(custom, P.FACTORY_DB))
+    res = {k: [t for t, p in c.execute(f'SELECT type, default_params FROM {P.PLUGIN_TABLES[k]} ORDER BY id')
+               if 0x5300 < json.loads(p)[4] <= 0x530F] for k in P.PLUGIN_TABLES}
+    c.close()
+    return res
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('original', help='original firmware .op1 (op1_246.op1)')
@@ -125,7 +135,7 @@ def main():
                            '  euclid sequencer (6 slots), OP-Z controller mode (SysEx F0 00 20 76 00 01 03 F7).',
                            'Built with synth_sdk/make_firmware.py; see docs/.'],
            'original': {'name': os.path.basename(a.original), 'sha256': P.sha256(op1)},
-           'patched_files': patched, 'added_files': added,
+           'patched_files': patched, 'added_files': added, 'plugins': plugin_rows(a.custom),
            'result': {'tar_sha256': '', 'sha256': ''}}
 
     # reference: run the real patch pipeline once (per-file checks active, result not known yet)
